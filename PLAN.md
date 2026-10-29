@@ -2,7 +2,7 @@
 
 One step per weekly build session. Do the first unchecked step, then check it off and log it in LOG.md.
 
-- [ ] 1. Project skeleton: Python project (`src/`, `data/`, `site/`, `tests/`), `requirements.txt`, README with how to run.
+- [x] 1. Project skeleton: Python project (`src/`, `data/`, `site/`, `tests/`), `requirements.txt`, README with how to run.
 - [ ] 2. Fertilizer + fuel puller: download the latest USDA AMS Iowa Production Cost Report (2863) — prefer the ESMIS CSV — parse anhydrous, urea, UAN28/32, DAP, potash, diesel, propane into `data/fertilizer.csv` with date + source URL. Add a test with a saved sample file.
 - [ ] 3. Add the Illinois Production Cost Report to the same puller.
 - [ ] 4. EIA puller: Midwest (PADD 2) on-highway diesel and propane via the EIA API (key from env var `EIA_API_KEY`; skip cleanly if missing).

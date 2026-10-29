@@ -6,3 +6,5 @@ node_modules/
 *.sqlite
 *.db
 .DS_Store
+.pytest_cache/
+venv/

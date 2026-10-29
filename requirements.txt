@@ -1,0 +1,5 @@
+# Runtime
+requests>=2.31
+
+# Testing
+pytest>=8.0
