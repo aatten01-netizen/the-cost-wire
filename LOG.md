@@ -2,6 +2,23 @@
 
 Newest first.
 
+## 2026-10-29 — Step 2a: Iowa fertilizer + fuel puller (CSV edition)
+**What I found**
+USDA used to publish the Iowa Production Cost Report as a CSV on ESMIS, but that CSV stopped updating in April 2024. The current report (latest is dated Oct 16, 2026) is only a PDF. So I split Step 2 in PLAN.md: 2a = CSV parser (done today), 2b = PDF parser (next).
+
+**What I built**
+- `src/costwire/iowa_cost.py`: finds the newest Iowa CSV on ESMIS, reads anhydrous, urea, UAN 28%/32%, DAP, MAP, red potash, propane and farm diesel (the report's "Average" price), and saves them to `data/fertilizer.csv` with the report date and source link. If the report says "NA", that item is left out, never guessed. Running it twice doesn't duplicate rows. It prints a warning if the newest data is more than 3 weeks old.
+- A real sample report (Apr 2, 2024) in `tests/samples/` and 10 new tests (22 total, all pass). No real network calls in tests.
+- `.github/workflows/fetch-samples.yml`: a free GitHub Action that downloads the current report PDF into `tests/samples/ams_2863.pdf`. My build sandbox can't reach usda.gov, but GitHub can, so this gets us a real PDF to build Step 2b against. It should run on its own when this push lands.
+
+**How to try it**
+`python -m pytest` (22 pass). `python -m costwire.iowa_cost` downloads the latest CSV edition (will warn that it's old).
+
+**What Andy needs to do**
+Nothing required. If `tests/samples/ams_2863.pdf` doesn't show up in the repo, check the "Fetch sample reports" run in the repo's Actions tab: https://github.com/aatten01-netizen/the-cost-wire/actions
+
+**Next:** Step 2b — parse the current Iowa report PDF.
+
 ## 2026-10-29 — Step 1: Project skeleton
 **What I built**
 - Folders: `src/costwire/` (code), `data/`, `site/`, `tests/`.

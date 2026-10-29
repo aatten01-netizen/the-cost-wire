@@ -1,0 +1,18 @@
+NW_GR910,Iowa Production Cost Report,04/2/2024,
+Commodity,Low Price,High Price,Average
+Anhydrous ammonia,725.00,835.00,770.00
+Urea 46-0-0,530.00,665.00,576.67
+Liquid Nitrogen 28% spread,NA,NA,NA
+Liquid Nitrogen 32% spread,355.00,430.00,396.67
+Lime (Applied),NA,NA,NA
+DAP(Diammonium Phosphate 18%N 46%P),775.00,790.00,785.00
+MAP (Monoammonium Phosphate 11%N 52%P),800.00,914.00,843.17
+Potash (Red) (0-0-60),470.00,591.00,550.75
+Potash (White) (0-0-62),NA,NA,NA
+Propane (LP Gas) per gal <1000 gallons,1.54,1.74,1.61
+Farm Diesel Fuel per gal <1000 gallons,3.20,3.70,3.45
+Source: USDA Market News Service  Des Moines IA,,,
+  515-284-4460  Desm.LPGMN@ams.usda.gov,,,
+24 Hour recorded market information 515-284-4830,,,
+www.ams.usda.gov/mnreports/NW_GR210.txt,,,
+www.ams.usda.gov/LPSMarketNewsPage,,,
