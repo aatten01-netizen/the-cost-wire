@@ -17,6 +17,7 @@ class PriceRecord:
     as_of: date        # the date the source says the price applies to
     source_url: str    # link to the exact report
     source_name: str   # e.g. "USDA AMS Iowa Production Cost Report"
+    region: str = ""   # e.g. "IA" or "IL" (state the price is for)
 
     def __post_init__(self):
         if not self.item.strip():
@@ -41,4 +42,5 @@ class PriceRecord:
             "as_of": self.as_of.isoformat(),
             "source_name": self.source_name,
             "source_url": self.source_url,
+            "region": self.region,
         }

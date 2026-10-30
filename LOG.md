@@ -2,6 +2,26 @@
 
 Newest first.
 
+## 2026-10-30 — Step 3a: Illinois Production Cost Report puller
+**What I built**
+- `src/costwire/illinois_cost.py` reads the Illinois Production Cost Report (USDA AMS + Illinois Dept. of Ag, bi-weekly): https://www.ams.usda.gov/mnreports/ams_3195.pdf. It takes the "Average" price for anhydrous, urea, UAN28/32, DAP, MAP, potash, farm diesel and propane. "NA" = left out. An average outside its low–high range = skipped with a warning.
+- I can't download the current Illinois PDF from my build sandbox (usda.gov is blocked here), so I don't know its exact layout yet. The parser reads both layouts I could confirm: the older Illinois table (2022) and the newer USDA layout that the current Iowa report uses.
+- `data/fertilizer.csv` now has a `region` column (IA / IL) so Iowa and Illinois anhydrous don't get mixed up. Your existing Iowa rows were tagged IA.
+- New `python -m costwire.pull_fertilizer` pulls Iowa and Illinois in one go. If one state's site is down, the other still runs.
+- The "Fetch sample reports" Action now also grabs the Illinois PDF (still hand-run only).
+- 13 new tests (41 total, all pass). No Illinois numbers were added to the data file yet: I won't publish numbers until the parser is checked on a real report.
+
+**Split:** Step 3 is now 3a (done) and 3b (check against a real Illinois PDF).
+
+**How to try it**
+`python -m pytest`. On your computer: `python -m costwire.pull_fertilizer` (downloads both reports), or `python -m costwire.illinois_cost --pdf ams_3195.pdf` for a saved file.
+
+**What Andy needs to do** (for Step 3b, same steps as the Iowa PDF)
+1. Open https://www.ams.usda.gov/mnreports/ams_3195.pdf and save it.
+2. Upload it on GitHub to `tests/samples/` named `ams_3195.pdf`: https://github.com/aatten01-netizen/the-cost-wire/tree/main/tests/samples > Add file > Upload files.
+
+**Next:** Step 3b once the PDF is uploaded. Until then the bot can skip ahead to Step 4 (EIA diesel + propane), which doesn't depend on it. Step 4 needs a free EIA key (`EIA_API_KEY`, link in `.env.example`); it will be built to skip cleanly without one.
+
 ## 2026-10-30 — Step 2b: Iowa puller, PDF edition
 **What I built**
 - `src/costwire/iowa_cost.py` now reads the current Iowa Production Cost Report PDF (https://www.ams.usda.gov/mnreports/ams_2863.pdf) with pdfplumber (free). It takes the "Average" price on each row, the "week ending" date as the date, and the PDF link as the source. Missing prices ("NA") are left out. A row whose average isn't between its low and high is skipped with a warning (that would mean we read it wrong).

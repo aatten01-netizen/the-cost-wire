@@ -22,6 +22,7 @@ source .venv/bin/activate        # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
 cp .env.example .env             # fill in keys when a step needs them
 python -m pytest                 # run the tests
+python -m costwire.pull_fertilizer   # pull Iowa + Illinois fertilizer/fuel into data/fertilizer.csv
 ```
 
 Data credit: USDA AMS, USDA NASS, U.S. Energy Information Administration (EIA).

@@ -1,4 +1,4 @@
-# Downloads the current USDA AMS Iowa Production Cost Report PDF into
+# Downloads the current USDA AMS Iowa (and Illinois) Production Cost Report PDFs into
 # tests/samples/ so the PDF parser (PLAN step 2b) can be tested against the
 # real file. Free: uses GitHub's built-in token, no keys.
 # Runs by hand only (Actions tab > Fetch sample reports > Run workflow).
@@ -23,10 +23,15 @@ jobs:
           curl -fsSL -A "TheCostWire/0.1" -o tests/samples/ams_2863.pdf \
             https://www.ams.usda.gov/mnreports/ams_2863.pdf
           file tests/samples/ams_2863.pdf
+      - name: Download Illinois Production Cost Report PDF
+        run: |
+          curl -fsSL -A "TheCostWire/0.1" -o tests/samples/ams_3195.pdf \
+            https://www.ams.usda.gov/mnreports/ams_3195.pdf
+          file tests/samples/ams_3195.pdf
       - name: Commit sample if new
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "41898333+github-actions[bot]@users.noreply.github.com"
-          git add tests/samples/ams_2863.pdf
-          git diff --cached --quiet || git commit -m "Add sample: current Iowa Production Cost Report PDF"
+          git add tests/samples/ams_2863.pdf tests/samples/ams_3195.pdf
+          git diff --cached --quiet || git commit -m "Add samples: current Iowa + Illinois Production Cost Report PDFs"
           git push

@@ -52,7 +52,8 @@ ITEMS = [
     ("farm diesel", "diesel", "$/gal"),
 ]
 
-CSV_COLUMNS = ["item", "price", "unit", "as_of", "source_name", "source_url"]
+REGION = "IA"
+CSV_COLUMNS = ["item", "price", "unit", "as_of", "source_name", "source_url", "region"]
 
 
 def _match_item(commodity: str):
@@ -98,7 +99,7 @@ def parse_report_csv(text: str, source_url: str) -> list[PriceRecord]:
         if price is None:
             continue  # no price this report: leave it out
         seen.add(item)
-        records.append(PriceRecord(item, price, unit, report_date, source_url, SOURCE_NAME))
+        records.append(PriceRecord(item, price, unit, report_date, source_url, SOURCE_NAME, REGION))
     if not records:
         raise ValueError("No prices found in report")
     return records
@@ -177,7 +178,7 @@ def parse_report_pdf_text(text: str, source_url: str) -> list[PriceRecord]:
                   file=sys.stderr)
             continue
         seen.add(item)
-        records.append(PriceRecord(item, avg, unit, report_date, source_url, SOURCE_NAME))
+        records.append(PriceRecord(item, avg, unit, report_date, source_url, SOURCE_NAME, REGION))
     if not records:
         raise ValueError("No prices found in report PDF")
     return records
@@ -211,7 +212,11 @@ def read_saved(path=None) -> list[dict]:
     if not path.exists():
         return []
     with open(path, newline="") as f:
-        return list(csv.DictReader(f))
+        rows = list(csv.DictReader(f))
+    for row in rows:  # files saved before Illinois was added had no region column
+        if not row.get("region"):
+            row["region"] = "IA" if "Iowa" in row["source_name"] else ""
+    return rows
 
 
 def save_records(records: list[PriceRecord], path=None) -> int:
@@ -225,7 +230,7 @@ def save_records(records: list[PriceRecord], path=None) -> int:
     new_rows = [r.to_row() for r in records
                 if (r.item, r.as_of.isoformat(), r.source_name) not in keys]
     rows = existing + new_rows
-    rows.sort(key=lambda r: (r["as_of"], r["item"]))
+    rows.sort(key=lambda r: (r["as_of"], r["region"], r["item"]))
     path.parent.mkdir(parents=True, exist_ok=True)
     with open(path, "w", newline="") as f:
         writer = csv.DictWriter(f, fieldnames=CSV_COLUMNS)
