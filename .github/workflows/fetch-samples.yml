@@ -1,14 +1,14 @@
 # Downloads the current USDA AMS Iowa Production Cost Report PDF into
 # tests/samples/ so the PDF parser (PLAN step 2b) can be tested against the
 # real file. Free: uses GitHub's built-in token, no keys.
-# Runs when this file changes, or by hand from the Actions tab.
+# Runs by hand only (Actions tab > Fetch sample reports > Run workflow).
+# The push trigger was removed on 2026-10-30: GitHub refused to start the job
+# because the account's Actions minutes / spending limit ran out, so it only
+# made red X's. Run it by hand once GitHub billing is sorted.
 name: Fetch sample reports
 
 on:
   workflow_dispatch:
-  push:
-    branches: [main]
-    paths: [".github/workflows/fetch-samples.yml"]
 
 permissions:
   contents: write

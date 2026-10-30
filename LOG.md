@@ -2,6 +2,19 @@
 
 Newest first.
 
+## 2026-10-30 — Fix: "Fetch sample reports" Action failed
+**What happened**
+The Action never ran a single step. GitHub refused to start it: "recent account payments have failed or your spending limit needs to be increased." That is a GitHub account billing block, not a code bug. It hits every private repo on the account (market-sentry's GitHub jobs have been refused the same way since Oct 22). The live Commodity Wire 10:00 and 2:00 emails are NOT affected; they don't run on GitHub Actions.
+
+**What I changed**
+- `fetch-samples.yml` now runs by hand only, so it stops failing on every push.
+
+**What Andy needs to do** (pick ONE)
+1. Fastest: on your phone or computer, open https://www.ams.usda.gov/mnreports/ams_2863.pdf, save it, then upload it on GitHub to `tests/samples/` named `ams_2863.pdf` (repo page > tests/samples > Add file > Upload files). That unblocks Step 2b.
+2. Or fix GitHub: go to https://github.com/settings/billing and check for a failed payment or Actions minutes used up. Then run the Action by hand from https://github.com/aatten01-netizen/the-cost-wire/actions.
+
+**Note for the build bot:** until `tests/samples/ams_2863.pdf` exists, build Step 2b's PDF parser with pdfplumber and tests against a small text fixture shaped like the report table; don't check 2b off until it passes on the real PDF.
+
 ## 2026-10-29 — Step 2a: Iowa fertilizer + fuel puller (CSV edition)
 **What I found**
 USDA used to publish the Iowa Production Cost Report as a CSV on ESMIS, but that CSV stopped updating in April 2024. The current report (latest is dated Oct 16, 2026) is only a PDF. So I split Step 2 in PLAN.md: 2a = CSV parser (done today), 2b = PDF parser (next).
