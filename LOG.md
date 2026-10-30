@@ -2,6 +2,22 @@
 
 Newest first.
 
+## 2026-10-30 — Step 2b: Iowa puller, PDF edition
+**What I built**
+- `src/costwire/iowa_cost.py` now reads the current Iowa Production Cost Report PDF (https://www.ams.usda.gov/mnreports/ams_2863.pdf) with pdfplumber (free). It takes the "Average" price on each row, the "week ending" date as the date, and the PDF link as the source. Missing prices ("NA") are left out. A row whose average isn't between its low and high is skipped with a warning (that would mean we read it wrong).
+- `pull()` tries the old CSV first; if it's more than 3 weeks old or won't download, it uses the PDF. Same output file as before: `data/fertilizer.csv`.
+- New: `python -m costwire.iowa_cost --pdf FILE` reads a report PDF you saved by hand.
+- Loaded your uploaded report (week ending Oct 30, 2026) into `data/fertilizer.csv`: anhydrous $902.33/ton, UAN32 $510.00, MAP $976.00, red potash $499.80, farm diesel $5.65/gal, propane $1.69/gal. That week's report had no urea, UAN28 or DAP prices, so those are left out.
+- 6 new tests (28 total, all pass), including the real PDF.
+
+**How to try it**
+`pip install -r requirements.txt` then `python -m pytest`. `python -m costwire.iowa_cost` downloads the latest report (works on your computer or GitHub; my build sandbox can't reach usda.gov).
+
+**What Andy needs to do**
+Nothing new. Thanks for uploading the PDF. (The GitHub billing block from the entry below still matters for Step 8's weekly auto-run.)
+
+**Next:** Step 3 — add the Illinois Production Cost Report to the same puller.
+
 ## 2026-10-30 — Fix: "Fetch sample reports" Action failed
 **What happened**
 The Action never ran a single step. GitHub refused to start it: "recent account payments have failed or your spending limit needs to be increased." That is a GitHub account billing block, not a code bug. It hits every private repo on the account (market-sentry's GitHub jobs have been refused the same way since Oct 22). The live Commodity Wire 10:00 and 2:00 emails are NOT affected; they don't run on GitHub Actions.

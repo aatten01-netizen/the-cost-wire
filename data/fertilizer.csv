@@ -1,0 +1,7 @@
+item,price,unit,as_of,source_name,source_url
+anhydrous,902.33,$/ton,2026-10-30,USDA AMS Iowa Production Cost Report,https://www.ams.usda.gov/mnreports/ams_2863.pdf
+diesel,5.65,$/gal,2026-10-30,USDA AMS Iowa Production Cost Report,https://www.ams.usda.gov/mnreports/ams_2863.pdf
+map,976.0,$/ton,2026-10-30,USDA AMS Iowa Production Cost Report,https://www.ams.usda.gov/mnreports/ams_2863.pdf
+potash,499.8,$/ton,2026-10-30,USDA AMS Iowa Production Cost Report,https://www.ams.usda.gov/mnreports/ams_2863.pdf
+propane,1.69,$/gal,2026-10-30,USDA AMS Iowa Production Cost Report,https://www.ams.usda.gov/mnreports/ams_2863.pdf
+uan32,510.0,$/ton,2026-10-30,USDA AMS Iowa Production Cost Report,https://www.ams.usda.gov/mnreports/ams_2863.pdf

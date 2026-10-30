@@ -4,7 +4,7 @@ One step per weekly build session. Do the first unchecked step, then check it of
 
 - [x] 1. Project skeleton: Python project (`src/`, `data/`, `site/`, `tests/`), `requirements.txt`, README with how to run.
 - [x] 2a. Iowa puller, CSV edition: parse the ESMIS CSV (NW_GR910) for anhydrous, urea, UAN28/32, DAP, MAP, potash, diesel, propane into `data/fertilizer.csv` with date + source URL. Test with a saved sample. Warns when the newest CSV is stale (the CSV edition stopped in April 2024).
-- [ ] 2b. Iowa puller, PDF edition: parse the current report PDF (https://www.ams.usda.gov/mnreports/ams_2863.pdf) using the real sample in `tests/samples/ams_2863.pdf` (downloaded by the "Fetch sample reports" Action). Free library (e.g. pdfplumber). Same output as 2a; pull uses the PDF when the CSV is stale.
+- [x] 2b. Iowa puller, PDF edition: parse the current report PDF (https://www.ams.usda.gov/mnreports/ams_2863.pdf) using the real sample in `tests/samples/ams_2863.pdf` (downloaded by the "Fetch sample reports" Action). Free library (e.g. pdfplumber). Same output as 2a; pull uses the PDF when the CSV is stale.
 - [ ] 3. Add the Illinois Production Cost Report to the same puller.
 - [ ] 4. EIA puller: Midwest (PADD 2) on-highway diesel and propane via the EIA API (key from env var `EIA_API_KEY`; skip cleanly if missing).
 - [ ] 5. Change calculator: for each item, price vs 2 weeks ago and vs 1 year ago (dollars and %). Tests.

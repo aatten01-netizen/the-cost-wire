@@ -10,7 +10,17 @@ The CSV edition of this report (file NW_GR910.TXT on ESMIS) looks like:
 We keep the "Average" column for each item we care about. "NA" means the
 report had no price that week, so we leave that item out (never guess).
 
-Run it:  python -m costwire.iowa_cost
+Since April 2024 the report is only published as a PDF
+(https://www.ams.usda.gov/mnreports/ams_2863.pdf). Its table lines look like:
+
+    Anhydrous Ammonia Ask 892.00 - 915.00 902.33 (3.17) F.O.B. Current
+
+so for the PDF we pull out the text (with the free pdfplumber library) and read
+the "Average" number on each line. `pull()` uses the PDF whenever the CSV is
+stale.
+
+Run it:  python -m costwire.iowa_cost              (download the latest)
+         python -m costwire.iowa_cost --pdf FILE   (read a saved report PDF)
 """
 
 import csv
@@ -24,7 +34,9 @@ from .records import PriceRecord
 
 SOURCE_NAME = "USDA AMS Iowa Production Cost Report"
 ESMIS_PAGE = "https://esmis.nal.usda.gov/publication/iowa-production-cost-report-bi-weekly-csv"
+PDF_URL = "https://www.ams.usda.gov/mnreports/ams_2863.pdf"
 OUTPUT_FILE = DATA_DIR / "fertilizer.csv"
+STALE_DAYS = 21
 
 # How each report row maps to our short item names. Matched on the start of
 # the "Commodity" text, lower-cased. Order matters: first match wins.
@@ -92,6 +104,97 @@ def parse_report_csv(text: str, source_url: str) -> list[PriceRecord]:
     return records
 
 
+# ---------------------------------------------------------------------------
+# PDF edition (current report)
+# ---------------------------------------------------------------------------
+
+# How each PDF row name maps to our item names. Matched on the start of the
+# row text, lower-cased. First match wins. White potash is NOT listed, so it
+# can never be mistaken for red potash.
+PDF_ITEMS = [
+    ("anhydrous ammonia", "anhydrous", "$/ton"),
+    ("urea", "urea", "$/ton"),
+    ("liquid nitrogen (28", "uan28", "$/ton"),
+    ("liquid nitrogen (32", "uan32", "$/ton"),
+    ("dap", "dap", "$/ton"),
+    ("diammonium", "dap", "$/ton"),
+    ("map", "map", "$/ton"),
+    ("monoammonium", "map", "$/ton"),
+    ("potash (red", "potash", "$/ton"),
+    ("no. 2 diesel", "diesel", "$/gal"),
+    ("farm diesel", "diesel", "$/gal"),
+    ("diesel", "diesel", "$/gal"),
+    ("propane", "propane", "$/gal"),
+]
+
+_NUM = r"[\d,]+\.\d+"
+# name, sale type, low price, optional "- high price", average
+_PDF_ROW = re.compile(
+    rf"^(?P<name>.+?)\s+(?:Ask|Bid|Offer|Sale|Sell|Buy)\s+"
+    rf"(?P<low>{_NUM})(?:\s*-\s*(?P<high>{_NUM}))?\s+(?P<avg>{_NUM})\b"
+)
+_PDF_DATE = re.compile(r"week ending\s+(\d{1,2}/\d{1,2}/\d{4})", re.I)
+
+
+def _match_pdf_item(name: str):
+    text = name.strip().lower()
+    for prefix, item, unit in PDF_ITEMS:
+        if text.startswith(prefix):
+            return item, unit
+    return None
+
+
+def parse_report_pdf_text(text: str, source_url: str) -> list[PriceRecord]:
+    """Turn the text of the report PDF into PriceRecords.
+
+    Rows with no numbers (e.g. "NA") are skipped: we never guess a price.
+    A row whose average isn't between its low and high is also skipped,
+    because that means we read the line wrong.
+    """
+    if "production cost report" not in text.lower():
+        raise ValueError("This doesn't look like the Iowa Production Cost Report PDF")
+    found = _PDF_DATE.search(text)
+    if not found:
+        raise ValueError("Can't find 'week ending' date in report PDF")
+    report_date = datetime.strptime(found.group(1), "%m/%d/%Y").date()
+
+    records = []
+    seen = set()
+    for line in text.splitlines():
+        row = _PDF_ROW.match(line.strip())
+        if not row:
+            continue
+        match = _match_pdf_item(row["name"])
+        if match is None:
+            continue  # lime, white potash, etc.
+        item, unit = match
+        if item in seen:
+            continue
+        low, avg = _parse_number(row["low"]), _parse_number(row["avg"])
+        high = _parse_number(row["high"]) if row["high"] else low
+        if not (low <= avg <= high):
+            print(f"WARNING: skipped {item}: average {avg} not between {low} and {high}",
+                  file=sys.stderr)
+            continue
+        seen.add(item)
+        records.append(PriceRecord(item, avg, unit, report_date, source_url, SOURCE_NAME))
+    if not records:
+        raise ValueError("No prices found in report PDF")
+    return records
+
+
+def pdf_to_text(pdf_bytes: bytes) -> str:
+    """Pull the text out of a PDF (all pages)."""
+    import pdfplumber
+
+    with pdfplumber.open(io.BytesIO(pdf_bytes)) as pdf:
+        return "\n".join(page.extract_text() or "" for page in pdf.pages)
+
+
+def parse_report_pdf(pdf_bytes: bytes, source_url: str = PDF_URL) -> list[PriceRecord]:
+    return parse_report_pdf_text(pdf_to_text(pdf_bytes), source_url)
+
+
 def find_latest_csv_url(esmis_html: str) -> str:
     """Pick the newest NW_GR910.TXT link from the ESMIS publication page.
 
@@ -135,31 +238,61 @@ def days_old(records: list[PriceRecord], today: date) -> int:
     return (today - max(r.as_of for r in records)).days
 
 
-def pull(get=None, today=None, out=None) -> list[PriceRecord]:
-    """Download the newest CSV edition and save it. `get` is swappable for tests."""
-    if get is None:
-        import requests
+def _download(url, as_bytes=False):
+    import requests
 
-        def get(url):
-            resp = requests.get(url, timeout=60, headers={"User-Agent": "TheCostWire/0.1"})
-            resp.raise_for_status()
-            return resp.text
+    resp = requests.get(url, timeout=60, headers={"User-Agent": "TheCostWire/0.1"})
+    resp.raise_for_status()
+    return resp.content if as_bytes else resp.text
 
-    url = find_latest_csv_url(get(ESMIS_PAGE))
-    records = parse_report_csv(get(url), url)
+
+def pull(get=None, get_bytes=None, today=None, out=None) -> list[PriceRecord]:
+    """Download the newest report and save it.
+
+    Tries the CSV edition first. If it's more than 3 weeks old (or fails),
+    reads the current PDF instead. `get` / `get_bytes` are swappable for tests.
+    """
+    get = get or _download
+    get_bytes = get_bytes or (lambda url: _download(url, as_bytes=True))
+    today = today or date.today()
     out = out or OUTPUT_FILE
+
+    records = []
+    try:
+        url = find_latest_csv_url(get(ESMIS_PAGE))
+        records = parse_report_csv(get(url), url)
+    except Exception as exc:
+        print(f"Iowa CSV edition unavailable ({exc}); trying the PDF.", file=sys.stderr)
+
+    if not records or days_old(records, today) > STALE_DAYS:
+        if records:
+            print(f"Iowa CSV is {days_old(records, today)} days old; using the PDF edition.")
+        records = parse_report_pdf(get_bytes(PDF_URL), PDF_URL)
+
     added = save_records(records, out)
-    age = days_old(records, today or date.today())
+    age = days_old(records, today)
     print(f"Iowa report dated {records[0].as_of}: {len(records)} prices, {added} new rows -> {out}")
-    if age > 21:
-        print(f"WARNING: newest Iowa CSV is {age} days old. The CSV edition may have stopped; "
-              "the current report is the PDF at https://www.ams.usda.gov/mnreports/ams_2863.pdf")
+    if age > STALE_DAYS:
+        print(f"WARNING: newest Iowa report is {age} days old.")
+    return records
+
+
+def load_pdf_file(path, out=None) -> list[PriceRecord]:
+    """Read a report PDF saved on disk (e.g. downloaded by hand) and save it."""
+    from pathlib import Path
+
+    records = parse_report_pdf(Path(path).read_bytes(), PDF_URL)
+    added = save_records(records, out or OUTPUT_FILE)
+    print(f"Iowa report dated {records[0].as_of}: {len(records)} prices, {added} new rows")
     return records
 
 
 if __name__ == "__main__":
     try:
-        pull()
+        if len(sys.argv) == 3 and sys.argv[1] == "--pdf":
+            load_pdf_file(sys.argv[2])
+        else:
+            pull()
     except Exception as exc:  # network or format problem: say so plainly
         print(f"Iowa pull failed: {exc}", file=sys.stderr)
         sys.exit(1)
