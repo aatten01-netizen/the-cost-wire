@@ -148,3 +148,31 @@ def test_one_state_failing_does_not_stop_the_other(capsys):
     assert "Iowa pull failed: site down" in capsys.readouterr().err
     assert pull_fertilizer.main([("Iowa", broken), ("Illinois", lambda: [])]) == 0
     assert pull_fertilizer.main([("Iowa", broken), ("Illinois", broken)]) == 1
+
+
+def test_real_illinois_pdf_week_ending_oct_30_2026():
+    """The real report Andy uploaded (tests/samples/ams_3195.pdf)."""
+    pdf = (TESTS_DIR / "samples" / "ams_3195.pdf").read_bytes()
+    records = illinois_cost.parse_report_pdf(pdf)
+    prices = {r.item: r.price for r in records}
+    assert prices == {
+        "anhydrous": 981.11,
+        "dap": 932.14,
+        "uan28": 467.86,
+        "uan32": 540.00,   # single price, no range
+        "map": 948.00,
+        "potash": 517.73,
+        "urea": 770.00,
+        "diesel": 5.71,    # No. 2 Diesel (Farm); Biodiesel is not read as diesel
+    }
+    assert "propane" not in prices  # this report has no propane row
+    for r in records:
+        assert r.as_of == date(2026, 10, 30)
+        assert r.region == "IL"
+        assert r.source_url == "https://www.ams.usda.gov/mnreports/ams_3195.pdf"
+        assert r.unit == ("$/gal" if r.item == "diesel" else "$/ton")
+
+
+def test_biodiesel_is_not_diesel():
+    assert illinois_cost.match_item("Biodiesel (Farm)") is None
+    assert illinois_cost.match_item("No. 2 Diesel (Farm)") == ("diesel", "$/gal")

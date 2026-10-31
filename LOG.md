@@ -2,6 +2,20 @@
 
 Newest first.
 
+## 2026-10-31 — Step 3b: Illinois parser checked on the real report
+**What I built**
+- Ran the Illinois parser on the real report you uploaded (`tests/samples/ams_3195.pdf`, week ending Oct 30, 2026). It read every row correctly with no code changes: the current Illinois report uses the newer USDA layout that Step 3a already handled.
+- Added a test on the real PDF (checks all 8 prices, the date, region IL and the source link) and a test that "Biodiesel" is never read as farm diesel. 43 tests, all pass.
+- Loaded the Illinois prices into `data/fertilizer.csv` (source: USDA AMS Illinois Production Cost Report, https://www.ams.usda.gov/mnreports/ams_3195.pdf): anhydrous $981.11/ton, DAP $932.14, UAN28 $467.86, UAN32 $540.00, MAP $948.00, red potash $517.73, urea $770.00, farm diesel $5.71/gal. This report has no propane row, so Illinois propane is left out.
+
+**How to try it**
+`python -m pytest`. `python -m costwire.illinois_cost --pdf tests/samples/ams_3195.pdf` (re-running adds no duplicate rows).
+
+**What Andy needs to do**
+Nothing new. Thanks for uploading the PDF. Step 4 will need a free EIA key (see below).
+
+**Next:** Step 4 — EIA Midwest (PADD 2) diesel + propane. Needs a free key in `EIA_API_KEY` (sign up: https://www.eia.gov/opendata/register.php); it will be built to skip cleanly without one.
+
 ## 2026-10-30 — Step 3a: Illinois Production Cost Report puller
 **What I built**
 - `src/costwire/illinois_cost.py` reads the Illinois Production Cost Report (USDA AMS + Illinois Dept. of Ag, bi-weekly): https://www.ams.usda.gov/mnreports/ams_3195.pdf. It takes the "Average" price for anhydrous, urea, UAN28/32, DAP, MAP, potash, farm diesel and propane. "NA" = left out. An average outside its low–high range = skipped with a warning.
