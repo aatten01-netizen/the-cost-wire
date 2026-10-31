@@ -22,7 +22,8 @@ source .venv/bin/activate        # Windows: .venv\Scripts\activate
 pip install -r requirements.txt
 cp .env.example .env             # fill in keys when a step needs them
 python -m pytest                 # run the tests
-python -m costwire.pull_fertilizer   # pull Iowa + Illinois fertilizer/fuel into data/fertilizer.csv
+python -m costwire.pull_fertilizer   # pull Iowa + Illinois fertilizer/fuel (+ EIA Midwest fuel) into data/fertilizer.csv
+EIA_API_KEY=yourkey python -m costwire.eia_fuel   # EIA Midwest diesel + propane only (skips if no key)
 ```
 
 Data credit: USDA AMS, USDA NASS, U.S. Energy Information Administration (EIA).

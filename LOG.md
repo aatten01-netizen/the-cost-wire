@@ -2,6 +2,27 @@
 
 Newest first.
 
+## 2026-10-31 — Step 4: EIA Midwest diesel + propane
+**What I built**
+- `src/costwire/eia_fuel.py` pulls two weekly Midwest (PADD 2) prices from the free EIA API:
+  - On-highway diesel, retail $/gal (weekly): https://www.eia.gov/dnav/pet/hist/LeafHandler.ashx?n=PET&s=EMD_EPD2D_PTE_R20_DPG&f=W
+  - Residential propane, $/gal (weekly, Oct–Mar only): https://www.eia.gov/dnav/pet/hist/LeafHandler.ashx?n=PET&s=W_EPLLPA_PRS_R20_DPG&f=W
+- They go into `data/fertilizer.csv` with region `PADD2` and their own names (`onhwy_diesel`, `res_propane`), so they never get mixed up with USDA "farm diesel"/"propane" (on-highway diesel includes road taxes). Source credited as U.S. Energy Information Administration (EIA), with the public EIA page as the link.
+- Key comes only from `EIA_API_KEY`. No key = prints a note and skips cleanly. The key is never saved or printed (even in error messages).
+- Propane missing in summer is expected and noted, not guessed. Warns if EIA data is more than 2 weeks old. Running twice adds no duplicate rows.
+- `python -m costwire.pull_fertilizer` now runs Iowa, Illinois and EIA together.
+- 9 new tests with fake EIA replies (52 total, all pass).
+- No EIA numbers are in the data file yet: my build sandbox can't reach api.eia.gov and there's no key here. They'll load the first time it runs with your key (your computer, or the Step 8 weekly job).
+
+**How to try it**
+`python -m pytest`. On your computer: `EIA_API_KEY=yourkey python -m costwire.eia_fuel`.
+
+**What Andy needs to do** (same as noted in the last entry; needed before Step 8 can publish EIA prices)
+1. Get a free EIA key: https://www.eia.gov/opendata/register.php (it's emailed to you).
+2. Add it as a GitHub secret named `EIA_API_KEY`: https://github.com/aatten01-netizen/the-cost-wire/settings/secrets/actions > New repository secret. Never paste it into a file in the repo.
+
+**Next:** Step 5 — change calculator (price vs 2 weeks ago and vs 1 year ago, $ and %).
+
 ## 2026-10-31 — Step 3b: Illinois parser checked on the real report
 **What I built**
 - Ran the Illinois parser on the real report you uploaded (`tests/samples/ams_3195.pdf`, week ending Oct 30, 2026). It read every row correctly with no code changes: the current Illinois report uses the newer USDA layout that Step 3a already handled.
