@@ -2,6 +2,22 @@
 
 Newest first.
 
+## 2026-11-01 — Step 5: Change calculator
+**What I built**
+- `src/costwire/changes.py` works out, for every price in `data/fertilizer.csv`, how much it moved vs about 2 weeks ago and vs about 1 year ago, in dollars and percent. Results go to `data/changes.csv` (one row per item + region).
+- It only compares a price with an earlier real saved price from the same report, same state, same item and same unit (Iowa anhydrous is never compared with Illinois anhydrous). The earlier price must be dated close to the target: within 4 days of "2 weeks ago", within 7 days of "1 year ago". If there isn't one, the change is left blank, never estimated. Each comparison keeps the earlier price's date and source link.
+- Right now every change is blank: we've only saved one week of prices (Oct 30, 2026). The 2-week numbers fill in on their own once the weekly pulls build up history; the 1-year numbers need a year of history (or older report data loaded later).
+- 11 new tests (63 total, all pass).
+- README: added `export PYTHONPATH=src` to the setup steps (without it, `python -m costwire...` can't find the code) and the new command.
+
+**How to try it**
+`python -m pytest`. Then `python -m costwire.changes` and open `data/changes.csv`.
+
+**What Andy needs to do**
+Nothing new. (Still open from before: the free EIA key as a GitHub secret, and the GitHub billing block that stops Actions; both matter for Step 8.)
+
+**Next:** Step 6 — brief writer (weekly brief as Markdown + HTML: headline = biggest move, table, one line per item, sources, disclaimer).
+
 ## 2026-10-31 — Step 4: EIA Midwest diesel + propane
 **What I built**
 - `src/costwire/eia_fuel.py` pulls two weekly Midwest (PADD 2) prices from the free EIA API:
