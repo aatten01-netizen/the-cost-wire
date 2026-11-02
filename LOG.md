@@ -2,6 +2,22 @@
 
 Newest first.
 
+## 2026-11-01 — Step 6: Brief writer
+**What I built**
+- `src/costwire/brief.py` writes the weekly brief from the saved prices, as Markdown and HTML (a plain template, no AI). Output: `briefs/<date>.md` and `briefs/<date>.html`.
+- What's in it: a headline (the biggest % move vs 2 weeks ago; if there are none yet, vs a year ago; if there's no history at all, it says so plainly), a table (every price, change vs 2 weeks and 1 year, date, source link), one "what changed" line per item, the sources with dates, a credit line naming only the agencies whose numbers are in that brief (USDA AMS, EIA), and the disclaimer (data, not advice; dealer prices differ; we never say buy or sell).
+- Every number comes straight from `data/fertilizer.csv` through the Step 5 change calculator. Missing changes show "n/a", never a guess.
+- First real brief is in `briefs/2026-11-02.md` / `.html` (Iowa + Illinois prices from the Oct 30 reports). All changes are "n/a" for now because we only have one week of saved prices; they fill in on their own as weekly pulls add history.
+- 16 new tests (79 total, all pass).
+
+**How to try it**
+`python -m pytest`. Then `python -m costwire.brief --date 2026-11-02` and open `briefs/2026-11-02.html` in your browser.
+
+**What Andy needs to do**
+Nothing new. (Still open from before: the free EIA key as a GitHub secret `EIA_API_KEY`, and the GitHub billing block that stops Actions; both matter for Step 8.)
+
+**Next:** Step 7 — static site (`site/` with latest brief, archive list, signup form placeholder, build script).
+
 ## 2026-11-01 — Step 5: Change calculator
 **What I built**
 - `src/costwire/changes.py` works out, for every price in `data/fertilizer.csv`, how much it moved vs about 2 weeks ago and vs about 1 year ago, in dollars and percent. Results go to `data/changes.csv` (one row per item + region).

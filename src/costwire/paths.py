@@ -6,3 +6,4 @@ ROOT = Path(__file__).resolve().parents[2]
 DATA_DIR = ROOT / "data"    # clean CSV/JSON from the weekly pulls
 SITE_DIR = ROOT / "site"    # the static website we publish
 TESTS_DIR = ROOT / "tests"
+BRIEFS_DIR = ROOT / "briefs"  # the weekly briefs (Markdown + HTML), one pair per week

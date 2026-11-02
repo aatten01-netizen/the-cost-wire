@@ -10,6 +10,7 @@ A weekly input-cost brief for Midwest farmers (fertilizer, fuel, feed, cash rent
 ## Folders
 - `src/costwire/` — the Python code
 - `data/` — clean CSV/JSON from the weekly data pulls
+- `briefs/` — the weekly briefs (Markdown + HTML)
 - `site/` — the static website
 - `tests/` — automated checks
 
@@ -26,6 +27,7 @@ python -m pytest                 # run the tests
 python -m costwire.pull_fertilizer   # pull Iowa + Illinois fertilizer/fuel (+ EIA Midwest fuel) into data/fertilizer.csv
 EIA_API_KEY=yourkey python -m costwire.eia_fuel   # EIA Midwest diesel + propane only (skips if no key)
 python -m costwire.changes       # price vs 2 weeks ago and 1 year ago -> data/changes.csv
+python -m costwire.brief         # weekly brief -> briefs/<date>.md and .html (add --date 2026-11-02 for a set date)
 ```
 
 Data credit: USDA AMS, USDA NASS, U.S. Energy Information Administration (EIA).
