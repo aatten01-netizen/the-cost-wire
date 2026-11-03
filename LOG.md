@@ -2,6 +2,26 @@
 
 Newest first.
 
+## 2026-11-03 — Step 7: Static site
+**What I built**
+- `src/costwire/site.py` turns the weekly briefs in `briefs/` into a small website in `site/`:
+  - `site/index.html` is the latest brief, with a nav bar (Latest / Archive) and a signup box.
+  - `site/archive.html` lists every brief, newest first.
+  - `site/briefs/<date>.html` holds each brief with the nav bar.
+  - `site/.nojekyll` so GitHub Pages serves the files as they are.
+- The signup box is a placeholder: the field and button are switched off and it says "coming soon". Nothing is collected or sent (Step 12 wires it up, after you approve).
+- The build wipes and rewrites `site/briefs/` each time, so deleted briefs don't linger. No briefs yet gives a simple "coming soon" home page.
+- The site shows the Nov 2, 2026 brief already built. No new numbers: the pages reuse the brief HTML.
+- 6 new tests (85 total, all pass). README has the new command.
+
+**How to try it**
+`python -m pytest`. Then `python -m costwire.site` and open `site/index.html` in your browser.
+
+**What Andy needs to do**
+Nothing new for this step. (Still open: the free EIA key as GitHub secret `EIA_API_KEY`, and the GitHub billing block that stops Actions; both matter for Step 8. Step 8 will also need GitHub Pages turned on: repo Settings > Pages > Source: GitHub Actions.)
+
+**Next:** Step 8 — GitHub Actions: weekly Monday 6 AM CT job that pulls data, builds the brief and site, commits, and deploys to GitHub Pages.
+
 ## 2026-11-01 — Step 6: Brief writer
 **What I built**
 - `src/costwire/brief.py` writes the weekly brief from the saved prices, as Markdown and HTML (a plain template, no AI). Output: `briefs/<date>.md` and `briefs/<date>.html`.

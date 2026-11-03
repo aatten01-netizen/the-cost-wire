@@ -28,6 +28,7 @@ python -m costwire.pull_fertilizer   # pull Iowa + Illinois fertilizer/fuel (+ E
 EIA_API_KEY=yourkey python -m costwire.eia_fuel   # EIA Midwest diesel + propane only (skips if no key)
 python -m costwire.changes       # price vs 2 weeks ago and 1 year ago -> data/changes.csv
 python -m costwire.brief         # weekly brief -> briefs/<date>.md and .html (add --date 2026-11-02 for a set date)
+python -m costwire.site          # build the website into site/ (open site/index.html)
 ```
 
 Data credit: USDA AMS, USDA NASS, U.S. Energy Information Administration (EIA).
