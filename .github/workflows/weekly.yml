@@ -1,0 +1,90 @@
+# The weekly Cost Wire job (PLAN step 8).
+# Every Monday at 6 AM Central: run the tests, pull the latest USDA + EIA
+# prices, work out changes, write the brief, build the website, commit it,
+# then publish site/ to GitHub Pages.
+#
+# GitHub's timer is UTC only, so it fires at 11:00 and 12:00 UTC and the
+# "Is it 6 AM Central?" step lets exactly the right one through (CDT vs CST).
+# Run it any time by hand: Actions tab > Weekly brief > Run workflow.
+#
+# Needs from Andy (see LOG.md): GitHub billing sorted (Actions is blocked),
+# secret EIA_API_KEY (optional: EIA prices skip without it), and Pages turned
+# on + repo variable PAGES_ENABLED=true (until then the publish job skips).
+name: Weekly brief
+
+on:
+  schedule:
+    - cron: "0 11 * * 1"
+    - cron: "0 12 * * 1"
+  workflow_dispatch:
+
+concurrency:
+  group: weekly-brief
+  cancel-in-progress: false
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    outputs:
+      ran: ${{ steps.when.outputs.run }}
+    env:
+      PYTHONPATH: src
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install
+        run: pip install -r requirements.txt
+      - name: Is it 6 AM Central?
+        id: when
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "run=true" >> "$GITHUB_OUTPUT"
+          else
+            python -m costwire.weekly --check-time >> "$GITHUB_OUTPUT"
+          fi
+          cat "$GITHUB_OUTPUT"
+      - name: Run the tests
+        if: steps.when.outputs.run == 'true'
+        run: python -m pytest -q
+      - name: Pull data, write brief, build site
+        if: steps.when.outputs.run == 'true'
+        env:
+          EIA_API_KEY: ${{ secrets.EIA_API_KEY }}
+        run: python -m costwire.weekly
+      - name: Commit the new data, brief and site
+        if: steps.when.outputs.run == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898333+github-actions[bot]@users.noreply.github.com"
+          git add data briefs site
+          if git diff --cached --quiet; then
+            echo "Nothing new this week."
+          else
+            git commit -m "Weekly brief $(TZ=America/Chicago date +%Y-%m-%d)"
+            git push
+          fi
+
+  deploy:
+    needs: build
+    if: needs.build.outputs.ran == 'true' && vars.PAGES_ENABLED == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main  # pick up the commit the build job just pushed
+      - uses: actions/configure-pages@v5
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: site
+      - id: deployment
+        uses: actions/deploy-pages@v4

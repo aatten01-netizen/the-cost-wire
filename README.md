@@ -29,6 +29,10 @@ EIA_API_KEY=yourkey python -m costwire.eia_fuel   # EIA Midwest diesel + propane
 python -m costwire.changes       # price vs 2 weeks ago and 1 year ago -> data/changes.csv
 python -m costwire.brief         # weekly brief -> briefs/<date>.md and .html (add --date 2026-11-02 for a set date)
 python -m costwire.site          # build the website into site/ (open site/index.html)
+python -m costwire.weekly        # all of the above in one go (what the Monday GitHub job runs)
 ```
+
+## Weekly automatic run
+`.github/workflows/weekly.yml` runs every Monday at 6 AM Central: tests, pull, changes, brief, site, commit, then publish `site/` to GitHub Pages (once Pages is turned on; see LOG.md). Run it by hand from the Actions tab > Weekly brief > Run workflow.
 
 Data credit: USDA AMS, USDA NASS, U.S. Energy Information Administration (EIA).

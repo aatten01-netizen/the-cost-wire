@@ -2,6 +2,25 @@
 
 Newest first.
 
+## 2026-11-03 — Step 8: Weekly GitHub Actions job + GitHub Pages
+**What I built**
+- `src/costwire/weekly.py`: one command that does the whole week: pull prices, work out changes, write the brief, build the site. If every price pull fails (USDA site down), it still rebuilds from the real prices already saved; it never makes numbers up. If there are no saved prices at all, it stops with an error.
+- `.github/workflows/weekly.yml` ("Weekly brief"): every Monday at 6 AM Central it installs the code, runs all the tests, runs the weekly build (EIA key from the `EIA_API_KEY` secret), commits any new data/brief/site files, then publishes `site/` to GitHub Pages. You can also start it by hand from the Actions tab.
+- 6 AM Central all year: GitHub's timer only knows UTC, so it fires at 11:00 and 12:00 UTC on Mondays and a small check lets through only the one that's 6 AM or later in Chicago (works for both CDT and CST).
+- The publish step waits for you: it skips cleanly until a repo variable `PAGES_ENABLED` is set to `true`.
+- Tested end to end here (my sandbox can't reach USDA, so it correctly fell back to the saved Oct 30 prices). 12 new tests (97 total, all pass), including checks on the workflow file itself. Added `pyyaml` to requirements (tests only).
+
+**How to try it**
+`python -m pytest`. Then `python -m costwire.weekly` and open `site/index.html`. On GitHub (once billing is fixed): Actions > Weekly brief > Run workflow.
+
+**What Andy needs to do**
+1. Fix the GitHub billing block (already noted; nothing on Actions runs until it's sorted): https://github.com/settings/billing
+2. NEW, a decision: GitHub Pages on a free account only works for **public** repos. This repo is private. Pick one: (a) make the repo public (Settings > General > Danger Zone > Change visibility: https://github.com/aatten01-netizen/the-cost-wire/settings). Nothing secret is in the repo (keys live only in GitHub secrets), but the code and data become visible to anyone. Or (b) keep it private and host the `site/` folder somewhere free later (I'd set that up as a separate step once you say so). Paid GitHub plans also allow private Pages, but I won't add anything paid without your OK.
+3. If you pick (a): turn on Pages at https://github.com/aatten01-netizen/the-cost-wire/settings/pages > Source: **GitHub Actions**. Then add a repo variable at https://github.com/aatten01-netizen/the-cost-wire/settings/variables/actions > New repository variable: name `PAGES_ENABLED`, value `true`.
+4. Still open: free EIA key as secret `EIA_API_KEY` (https://www.eia.gov/opendata/register.php, then https://github.com/aatten01-netizen/the-cost-wire/settings/secrets/actions). Without it the brief just leaves out EIA diesel/propane.
+
+**Next:** Step 9 — NASS Quick Stats puller: cash rents + land values for WI, IA, IL, MN (key from `NASS_API_KEY`), cash rent page.
+
 ## 2026-11-03 — Step 7: Static site
 **What I built**
 - `src/costwire/site.py` turns the weekly briefs in `briefs/` into a small website in `site/`:
