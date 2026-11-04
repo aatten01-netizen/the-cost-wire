@@ -39,15 +39,18 @@ ITEM_NAMES = {
     "propane": "Propane",
     "onhwy_diesel": "On-highway diesel (retail)",
     "res_propane": "Residential propane",
+    "ddgs": "Dried distillers grains (10%)",
 }
 
 REGION_NAMES = {
     "IA": "Iowa",
     "IL": "Illinois",
+    "MN": "Minnesota",
+    "WI": "Wisconsin",
     "PADD2": "Midwest (PADD 2)",
 }
 
-# Order items show up in the table: fertilizer first, then fuel.
+# Order items show up in the table: fertilizer first, then fuel, then feed.
 ITEM_ORDER = list(ITEM_NAMES)
 
 PERIOD_WORDS = {"2w": "2 weeks", "1y": "a year"}

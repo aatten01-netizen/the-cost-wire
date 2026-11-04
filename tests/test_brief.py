@@ -130,8 +130,8 @@ def test_write_brief_with_no_data_returns_none(tmp_path):
 
 
 def test_unknown_item_and_region_use_raw_names():
-    results = changes.compute([row("sulfur", 300.0, date(2026, 10, 30), region="MN")])
-    assert "MN sulfur: $300.00/ton" in brief.what_changed(results[0])
+    results = changes.compute([row("sulfur", 300.0, date(2026, 10, 30), region="ND")])
+    assert "ND sulfur: $300.00/ton" in brief.what_changed(results[0])
 
 
 def test_acronyms_stay_capitalized_in_sentences():

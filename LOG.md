@@ -2,6 +2,25 @@
 
 Newest first.
 
+## 2026-11-04 — Step 10a: Feed line (DDGS)
+**What I built**
+- `src/costwire/feed.py`: reads the USDA AMS **National Weekly Grain Co-Products Report** (https://www.ams.usda.gov/mnreports/ams_3618.pdf, report page https://mymarketnews.ams.usda.gov/viewReport/3618) and keeps the **dried distillers grains (10% moisture), $/ton** price for Iowa, Illinois, Minnesota and Wisconsin. Saved to `data/fertilizer.csv` as item `ddgs` with the report date and link, so the change calculator and brief pick it up like any other item. Wet distillers grains and the report's own $/bushel columns are ignored. A state with no price is left out, never guessed.
+- The weekly pull now runs the feed puller too (if it fails, the rest still runs). The brief shows it as "Dried distillers grains (10%)" with Minnesota/Wisconsin names; credit stays "USDA AMS".
+- Small fix: saving rows now treats the state as part of "is this row already saved?". Before, four states from one report on the same date would have been squashed into one row.
+- The "Fetch sample reports" Action now also downloads `ams_3618.pdf`.
+- 13 new tests (120 total, all pass).
+
+**Why only 10a (split the step):** my sandbox can't reach USDA, so I couldn't test against the real PDF. I built the parser from the layout of the Oct 26, 2026 report (seen through a web reader) and tested with made-up numbers. No feed prices are in the data yet. Step 10b checks it against the real PDF and loads real prices.
+
+**How to try it**
+`python -m pytest`. Then `python -m costwire.feed` (on a computer that can reach usda.gov) or `python -m costwire.feed --pdf ams_3618.pdf`, then `python -m costwire.brief` and look for the distillers grains rows.
+
+**What Andy needs to do**
+1. For Step 10b, either run Actions > "Fetch sample reports" > Run workflow (once billing is fixed): https://github.com/aatten01-netizen/the-cost-wire/actions , or download https://www.ams.usda.gov/mnreports/ams_3618.pdf and upload it to `tests/samples/ams_3618.pdf`: https://github.com/aatten01-netizen/the-cost-wire/upload/main/tests/samples
+2. Still open: GitHub billing block, `EIA_API_KEY` and `NASS_API_KEY` secrets, public-repo/Pages decision (see Steps 8 and 9).
+
+**Next:** Step 10b — check the feed parser against the real Grain Co-Products PDF (needs the PDF above). If it isn't there yet, Step 11 (email via Resend to a test address) can go ahead, since it doesn't depend on 10b.
+
 ## 2026-11-04 — Step 9: NASS cash rents + land values
 **What I built**
 - `src/costwire/nass_land.py`: pulls yearly USDA NASS numbers for WI, IA, IL, MN into `data/land.csv`: cash rent (non-irrigated cropland, pasture; state and county) and land value (cropland, farm real estate; state). County numbers NASS withheld "(D)" are left out, never filled in. Key comes only from `NASS_API_KEY`; with no key it skips cleanly. The key is never saved or printed; each row's source link is the exact query without the key.

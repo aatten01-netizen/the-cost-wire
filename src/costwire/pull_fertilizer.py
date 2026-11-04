@@ -1,4 +1,5 @@
-"""Pull every state's fertilizer + fuel report (and EIA Midwest fuel) into data/fertilizer.csv.
+"""Pull every state's fertilizer + fuel report, EIA Midwest fuel and the DDGS feed
+prices into data/fertilizer.csv.
 
 One state failing (site down, format changed) doesn't stop the others.
 Exit code is 1 only if every state failed.
@@ -8,12 +9,13 @@ Run it:  python -m costwire.pull_fertilizer
 
 import sys
 
-from . import eia_fuel, illinois_cost, iowa_cost
+from . import eia_fuel, feed, illinois_cost, iowa_cost
 
 PULLERS = [
     ("Iowa", iowa_cost.pull),
     ("Illinois", illinois_cost.pull),
     ("EIA Midwest fuel", eia_fuel.pull),  # skips cleanly without EIA_API_KEY
+    ("Feed (DDGS)", feed.pull),
 ]
 
 

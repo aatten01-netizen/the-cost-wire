@@ -24,7 +24,8 @@ pip install -r requirements.txt
 cp .env.example .env             # fill in keys when a step needs them
 export PYTHONPATH=src            # so python can find the costwire code (Windows: set PYTHONPATH=src)
 python -m pytest                 # run the tests
-python -m costwire.pull_fertilizer   # pull Iowa + Illinois fertilizer/fuel (+ EIA Midwest fuel) into data/fertilizer.csv
+python -m costwire.pull_fertilizer   # pull Iowa + Illinois fertilizer/fuel (+ EIA Midwest fuel, + DDGS feed) into data/fertilizer.csv
+python -m costwire.feed          # DDGS feed prices only (IA, IL, MN, WI); add --pdf FILE to read a saved report
 EIA_API_KEY=yourkey python -m costwire.eia_fuel   # EIA Midwest diesel + propane only (skips if no key)
 NASS_API_KEY=yourkey python -m costwire.nass_land   # yearly cash rents + land values -> data/land.csv (skips if no key)
 python -m costwire.changes       # price vs 2 weeks ago and 1 year ago -> data/changes.csv

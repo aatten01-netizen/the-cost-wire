@@ -226,9 +226,11 @@ def save_records(records: list[PriceRecord], path=None) -> int:
     """
     path = path or OUTPUT_FILE
     existing = read_saved(path)
-    keys = {(r["item"], r["as_of"], r["source_name"]) for r in existing}
+    # Region is part of the key: one report (e.g. the feed report) can have
+    # the same item for several states on the same date.
+    keys = {(r["item"], r["as_of"], r["source_name"], r.get("region", "")) for r in existing}
     new_rows = [r.to_row() for r in records
-                if (r.item, r.as_of.isoformat(), r.source_name) not in keys]
+                if (r.item, r.as_of.isoformat(), r.source_name, r.region) not in keys]
     rows = existing + new_rows
     rows.sort(key=lambda r: (r["as_of"], r["region"], r["item"]))
     path.parent.mkdir(parents=True, exist_ok=True)
