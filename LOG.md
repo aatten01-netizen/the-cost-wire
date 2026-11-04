@@ -2,6 +2,24 @@
 
 Newest first.
 
+## 2026-11-04 — Step 9: NASS cash rents + land values
+**What I built**
+- `src/costwire/nass_land.py`: pulls yearly USDA NASS numbers for WI, IA, IL, MN into `data/land.csv`: cash rent (non-irrigated cropland, pasture; state and county) and land value (cropland, farm real estate; state). County numbers NASS withheld "(D)" are left out, never filled in. Key comes only from `NASS_API_KEY`; with no key it skips cleanly. The key is never saved or printed; each row's source link is the exact query without the key.
+- `src/costwire/rentpage.py` + `site.py`: new page `site/cash-rent.html` ("Cash rent" in the nav): state table with change vs the year before (only when both years exist), county tables, source links, USDA NASS credit, "data, not advice".
+- The weekly job now also runs the NASS pull (a failure there never stops the brief) and passes the `NASS_API_KEY` secret.
+- 13 new tests (all pass). 6 older tests that read the real PDFs fail in THIS sandbox only: the PDF library crashes on a broken system crypto package (not caused by this step; they passed in earlier runs). Please check the Actions run is green once billing is fixed.
+
+**Not verified against the live NASS API**: my sandbox can't reach it and there is no key yet. The query names (`short_desc`, `agg_level_desc`, etc.) follow NASS's published Quick Stats format, but the first real run could show a mismatch. The page will say "not loaded yet" rather than show anything wrong.
+
+**How to try it**
+`NASS_API_KEY=yourkey python -m costwire.nass_land`, then `python -m costwire.site` and open `site/cash-rent.html`.
+
+**What Andy needs to do**
+1. Get the free NASS key: https://quickstats.nass.usda.gov/api and add it as GitHub secret `NASS_API_KEY`: https://github.com/aatten01-netizen/the-cost-wire/settings/secrets/actions
+2. Still open: `EIA_API_KEY` secret, GitHub billing block, and the public-repo/Pages decision (see Step 8 entry).
+
+**Next:** Step 10 — feed line (USDA AMS distillers grains / feedstuffs weekly report).
+
 ## 2026-11-03 — Step 8: Weekly GitHub Actions job + GitHub Pages
 **What I built**
 - `src/costwire/weekly.py`: one command that does the whole week: pull prices, work out changes, write the brief, build the site. If every price pull fails (USDA site down), it still rebuilds from the real prices already saved; it never makes numbers up. If there are no saved prices at all, it stops with an error.

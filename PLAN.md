@@ -12,7 +12,7 @@ One step per weekly build session. Do the first unchecked step, then check it of
 - [x] 6. Brief writer: build the weekly brief as Markdown + HTML from the data (template, no AI needed): headline = biggest move, table, one-line "what changed" per item, sources, disclaimer.
 - [x] 7. Static site: `site/` with latest brief, archive list, signup form placeholder. Build script.
 - [x] 8. GitHub Actions: weekly Monday 6 AM CT job that pulls data, builds the site, commits it; deploy to GitHub Pages.
-- [ ] 9. NASS Quick Stats puller: cash rents + land values for WI, IA, IL, MN (state + county where published), key from env var `NASS_API_KEY`. Cash rent page.
+- [x] 9. NASS Quick Stats puller: cash rents + land values for WI, IA, IL, MN (state + county where published), key from env var `NASS_API_KEY`. Cash rent page.
 - [ ] 10. Feed line: USDA AMS distillers grains / feedstuffs weekly report → one feed row in the brief.
 - [ ] 11. Email: send the weekly brief through Resend to a test address only (Andy). Key from env var `RESEND_API_KEY`. Do NOT email real subscribers until Andy says so.
 - [ ] 12. Signup form wired to a free list (Resend audience or Google Sheet). Andy approves before going live.

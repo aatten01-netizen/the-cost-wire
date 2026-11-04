@@ -18,6 +18,7 @@ import shutil
 import sys
 from datetime import date
 
+from . import nass_land, rentpage
 from .paths import BRIEFS_DIR, SITE_DIR
 
 BRIEF_NAME = re.compile(r"^(\d{4}-\d{2}-\d{2})\.html$")
@@ -59,6 +60,7 @@ def nav(prefix: str) -> str:
     """Nav bar. prefix is '' for pages in site/ and '../' for pages in site/briefs/."""
     return (f'<nav class="sitenav"><a class="brand" href="{prefix}index.html">The Cost Wire</a>'
             f'<a href="{prefix}index.html">Latest</a>'
+            f'<a href="{prefix}cash-rent.html">Cash rent</a>'
             f'<a href="{prefix}archive.html">Archive</a></nav>')
 
 
@@ -105,7 +107,16 @@ def empty_home() -> str:
         "<p>No briefs yet.</p>", "<p>The first brief is coming soon.</p>" + SIGNUP_BOX)
 
 
-def build_site(briefs_dir=None, site_dir=None) -> list:
+def rent_page(records) -> str:
+    """Full cash rent page: the rentpage content inside the same page frame as the archive."""
+    page = archive_page([]).replace("<title>The Cost Wire — archive</title>",
+                                    "<title>The Cost Wire — cash rent</title>")
+    start = page.index("<h1>Archive</h1>")
+    end = page.index("</body>")
+    return page[:start] + rentpage.render(records) + "\n" + page[end:]
+
+
+def build_site(briefs_dir=None, site_dir=None, land_file=None) -> list:
     """Write the site. Returns the list of brief dates published (newest first)."""
     site_dir = site_dir or SITE_DIR
     files = brief_files(briefs_dir)
@@ -126,6 +137,8 @@ def build_site(briefs_dir=None, site_dir=None) -> list:
     else:
         index = empty_home()
     (site_dir / "index.html").write_text(index, encoding="utf-8")
+    (site_dir / "cash-rent.html").write_text(
+        rent_page(nass_land.load_records(land_file)), encoding="utf-8")
     (site_dir / "archive.html").write_text(archive_page([d for d, _ in files]), encoding="utf-8")
     return [d for d, _ in files]
 

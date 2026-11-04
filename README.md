@@ -26,6 +26,7 @@ export PYTHONPATH=src            # so python can find the costwire code (Windows
 python -m pytest                 # run the tests
 python -m costwire.pull_fertilizer   # pull Iowa + Illinois fertilizer/fuel (+ EIA Midwest fuel) into data/fertilizer.csv
 EIA_API_KEY=yourkey python -m costwire.eia_fuel   # EIA Midwest diesel + propane only (skips if no key)
+NASS_API_KEY=yourkey python -m costwire.nass_land   # yearly cash rents + land values -> data/land.csv (skips if no key)
 python -m costwire.changes       # price vs 2 weeks ago and 1 year ago -> data/changes.csv
 python -m costwire.brief         # weekly brief -> briefs/<date>.md and .html (add --date 2026-11-02 for a set date)
 python -m costwire.site          # build the website into site/ (open site/index.html)

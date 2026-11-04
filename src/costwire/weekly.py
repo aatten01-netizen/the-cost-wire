@@ -21,7 +21,7 @@ import sys
 from datetime import date, datetime, timezone
 from zoneinfo import ZoneInfo
 
-from . import brief, changes, pull_fertilizer, site
+from . import brief, changes, nass_land, pull_fertilizer, site
 
 CENTRAL = ZoneInfo("America/Chicago")
 RUN_WEEKDAY = 0  # Monday
@@ -38,6 +38,7 @@ def run(brief_date: date, steps=None) -> int:
     """Run the weekly steps in order. Returns 0 if the brief and site got built."""
     steps = steps or {
         "pull": pull_fertilizer.main,
+        "land": nass_land.main,
         "changes": changes.main,
         "brief": lambda: brief.main(["--date", brief_date.isoformat()]),
         "site": site.main,
@@ -45,6 +46,10 @@ def run(brief_date: date, steps=None) -> int:
     pull_code = steps["pull"]()
     if pull_code != 0:
         print("Every price pull failed this week; building from the prices already saved.",
+              file=sys.stderr)
+    # Yearly cash rent / land value numbers: a failure here never stops the brief.
+    if "land" in steps and steps["land"]() != 0:
+        print("NASS cash rent / land value pull failed; using what is already saved.",
               file=sys.stderr)
     for name in ("changes", "brief", "site"):
         code = steps[name]()

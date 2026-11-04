@@ -54,6 +54,7 @@ jobs:
         if: steps.when.outputs.run == 'true'
         env:
           EIA_API_KEY: ${{ secrets.EIA_API_KEY }}
+          NASS_API_KEY: ${{ secrets.NASS_API_KEY }}
         run: python -m costwire.weekly
       - name: Commit the new data, brief and site
         if: steps.when.outputs.run == 'true'
