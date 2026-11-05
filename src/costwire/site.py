@@ -6,13 +6,16 @@ Pages it writes:
   site/briefs/<date>.html      each brief (same content as briefs/<date>.html)
   site/.nojekyll               tells GitHub Pages to serve files as they are
 
-The signup box is a placeholder only (Step 12 wires it up, after Andy
-approves). It does not collect or send anything.
+The signup box is a placeholder (collects nothing) UNLESS both env vars are set
+at build time: SIGNUP_FORM_URL (an https link, e.g. a Google Apps Script web app
+that writes to a Google Sheet, see docs/signup-google-sheet.md) and
+SIGNUP_LIVE=yes (Andy's go-ahead). Otherwise the page stays a placeholder.
 
 Run it:  python -m costwire.site
 """
 
 import html
+import os
 import re
 import shutil
 import sys
@@ -32,6 +35,28 @@ SIGNUP_BOX = """<section class="signup">
 </form>
 <p class="note">Signup is not open yet. Nothing you type here is saved or sent.</p>
 </section>"""
+
+LIVE_SIGNUP_BOX = """<section class="signup">
+<h2>Get the brief by email</h2>
+<p>A short email every Monday with fertilizer, fuel and feed prices and what changed.</p>
+<form method="post" action="{action}">
+<input type="email" name="email" placeholder="you@example.com" aria-label="Email address" required>
+<input type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px">
+<button type="submit">Sign up</button>
+</form>
+<p class="note">One email a week. We store only your email address. Data, not advice.</p>
+</section>"""
+
+
+def signup_box(env=None) -> str:
+    """The live form only when SIGNUP_FORM_URL is an https link AND SIGNUP_LIVE=yes."""
+    env = os.environ if env is None else env
+    url = (env.get("SIGNUP_FORM_URL") or "").strip()
+    live = (env.get("SIGNUP_LIVE") or "").strip().lower() == "yes"
+    if live and url.startswith("https://"):
+        return LIVE_SIGNUP_BOX.format(action=html.escape(url, quote=True))
+    return SIGNUP_BOX
+
 
 SITE_CSS = """
 .sitenav { display: flex; gap: 1rem; padding-bottom: 0.5rem; border-bottom: 2px solid #222; font-family: Georgia, serif; }
@@ -69,7 +94,7 @@ def wrap_brief(brief_html: str, prefix: str, with_signup: bool) -> str:
     page = brief_html.replace("</style>", SITE_CSS + "</style>", 1)
     page = page.replace("<body>", "<body>\n" + nav(prefix), 1)
     if with_signup:
-        page = page.replace("</body>", SIGNUP_BOX + "\n</body>", 1)
+        page = page.replace("</body>", signup_box() + "\n</body>", 1)
     return page
 
 
@@ -104,7 +129,7 @@ body {{ font-family: Georgia, serif; max-width: 860px; margin: 2rem auto; paddin
 
 def empty_home() -> str:
     return archive_page([]).replace("<h1>Archive</h1>", "<h1>The Cost Wire</h1>").replace(
-        "<p>No briefs yet.</p>", "<p>The first brief is coming soon.</p>" + SIGNUP_BOX)
+        "<p>No briefs yet.</p>", "<p>The first brief is coming soon.</p>" + signup_box())
 
 
 def rent_page(records) -> str:

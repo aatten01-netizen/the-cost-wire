@@ -2,6 +2,26 @@
 
 Newest first.
 
+## 2026-11-05 — Step 12: Signup form wired to a free Google Sheet (stays OFF until you say go)
+**What I built**
+- `site.py`: the signup box is still the "coming soon" placeholder. It turns into a real email form ONLY when both build settings are present: `SIGNUP_FORM_URL` (an https link) and `SIGNUP_LIVE=yes`. Missing either one, or a non-https link, keeps the placeholder. The live form has a hidden bot-trap field and stores only an email.
+- `docs/signup-google-sheet.md`: copy-paste Google Apps Script that saves signups to a Google Sheet (free, no new service).
+- Weekly workflow passes the two settings as repo Variables; `.env.example` updated.
+- 6 new tests in `tests/test_signup.py`. 130 pass; the same 6 old real-PDF tests fail in this sandbox only (PDF library crash, see Step 9).
+
+**Not verified live:** no Google Sheet exists, so the form post has not been tried for real.
+
+**How to try it**
+`SIGNUP_FORM_URL=https://example.com/x SIGNUP_LIVE=yes python -m costwire.site`, open `site/index.html`.
+
+**What Andy needs to do**
+1. Follow `docs/signup-google-sheet.md` (about 5 minutes) and add the repo variable `SIGNUP_FORM_URL`: https://github.com/aatten01-netizen/the-cost-wire/settings/variables/actions
+2. Test it with one of your own emails, then add variable `SIGNUP_LIVE` = `yes` when you approve.
+3. Step 10b still needs `tests/samples/ams_3618.pdf`: https://github.com/aatten01-netizen/the-cost-wire/upload/main/tests/samples
+4. Still open: GitHub billing, EIA/NASS/Resend keys, Pages decision.
+
+**Next:** Step 10b if the PDF is uploaded; otherwise Step 13 (accuracy check script).
+
 ## 2026-11-05 — Step 11: Test email via Resend (night shift)
 **What I built**
 - `src/costwire/email_brief.py`: sends the newest brief (HTML plus Markdown as plain text) through Resend to ONE test address, subject starts "[TEST]". Key only from `RESEND_API_KEY`, address from `BRIEF_TEST_EMAIL` (or `--to`). No key or address = skips and sends nothing. More than one address is refused. There is no subscriber sending anywhere in the code.
