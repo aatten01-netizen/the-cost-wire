@@ -2,6 +2,24 @@
 
 Newest first.
 
+## 2026-11-05 — Step 11: Test email via Resend (night shift)
+**What I built**
+- `src/costwire/email_brief.py`: sends the newest brief (HTML plus Markdown as plain text) through Resend to ONE test address, subject starts "[TEST]". Key only from `RESEND_API_KEY`, address from `BRIEF_TEST_EMAIL` (or `--to`). No key or address = skips and sends nothing. More than one address is refused. There is no subscriber sending anywhere in the code.
+- `--dry-run` shows what would be sent without sending. `.env.example` updated.
+- 8 new tests with a fake sender (Resend never called). 124 pass; the same 6 old real-PDF tests fail in this sandbox only (PDF library crypto crash, noted in Step 9), not caused by this step.
+
+**Not verified live:** no Resend key here, so the real send is untested. Sender is Resend's shared `onboarding@resend.dev`, which only delivers to your own Resend account email until you verify a domain.
+
+**How to try it**
+`python -m costwire.email_brief --to you@example.com --dry-run`, then with the key: `RESEND_API_KEY=... BRIEF_TEST_EMAIL=you@x.com python -m costwire.email_brief`
+
+**What Andy needs to do**
+1. Add a Resend API key as env var (you already use Resend) and pick your test address.
+2. Step 10b still needs `tests/samples/ams_3618.pdf` (my sandbox can't reach usda.gov): https://github.com/aatten01-netizen/the-cost-wire/upload/main/tests/samples
+3. Still open: GitHub billing, EIA/NASS secrets, Pages decision.
+
+**Next:** Step 10b if the PDF is uploaded; otherwise Step 12 (signup form wired to a free list, Andy approves before live).
+
 ## 2026-11-04 — Step 10a: Feed line (DDGS)
 **What I built**
 - `src/costwire/feed.py`: reads the USDA AMS **National Weekly Grain Co-Products Report** (https://www.ams.usda.gov/mnreports/ams_3618.pdf, report page https://mymarketnews.ams.usda.gov/viewReport/3618) and keeps the **dried distillers grains (10% moisture), $/ton** price for Iowa, Illinois, Minnesota and Wisconsin. Saved to `data/fertilizer.csv` as item `ddgs` with the report date and link, so the change calculator and brief pick it up like any other item. Wet distillers grains and the report's own $/bushel columns are ignored. A state with no price is left out, never guessed.
