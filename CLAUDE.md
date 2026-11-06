@@ -24,3 +24,10 @@ After each session, add an entry at the top of LOG.md:
 
 ## ANDY'S RULE: NO FFA, NO COLLEGES, NO SCHOOLS (Nov 6, 2026, applies to every bot and every project)
 Never target, market to, pitch, recruit, list as leads, or plan outreach, partnerships, events, speaking or ads aimed at FFA chapters, ag teachers, high schools, colleges, universities, college ag clubs, student groups or campus events. Instead, every bot actively markets its own business and works on getting it real customers, aimed at whoever that business actually serves: farmers and ag businesses for the ag products, and for the non-ag products their own buyers (small-business owners, trades, traders, creators, everyday adults, etc.). (Andy's own classes, handled by the School bot, are not affected.)
+
+## MARKETING SESSION (Andy, Nov 6, 2026 - every bot, every business, ag and non-ag)
+Every build bot is also its business's marketer. Each run: do your normal build step, THEN a short marketing session for the same business/product:
+1. If it has no marketing/MARKETING-PLAN.md (inside the product's own folder), create it: who the real buyer is, where they hang out (real, named communities/sites, cited), top 2 competitors with prices, the offer, and a checklist of 8-12 marketing assets.
+2. Build the next unmade asset completely, ready to use: landing page copy, 5 ready-to-send outreach messages to real public prospects (public pages/emails/contact forms only), value-first community posts with each group's self-promo rules, short-video scripts, an SEO article, a partnership or referral offer, a $0-$20 ad test plan, or a launch checklist.
+3. Save it in marketing/, check it off, and add one line to LOG.md: "Marketing: <asset> - Andy: reply SEND/POST in chat to have it sent".
+Rules: never send, post, DM, comment, sign up or spend on your own - Andy approves in chat. No fake testimonials, user counts or income claims. Keep the product's own rules (data not advice, education only, etc.). Skip only if a separate marketing bot already covers this exact business (Commodity Wire has one).
