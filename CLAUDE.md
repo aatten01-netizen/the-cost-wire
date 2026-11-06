@@ -21,3 +21,6 @@ Read BRIEF.md first (what we're building and why), then PLAN.md (the build steps
 ## Logging
 After each session, add an entry at the top of LOG.md:
 `## YYYY-MM-DD — Step N: <name>` then: what you built, how to try it, anything Andy needs to do (keys, sign-ups, decisions), what's next.
+
+## ANDY'S RULE: NO FFA, NO COLLEGES, NO SCHOOLS (Nov 6, 2026, applies to every bot and every project)
+Never target, market to, pitch, recruit, list as leads, or plan outreach, partnerships, events, speaking or ads aimed at FFA chapters, ag teachers, high schools, colleges, universities, college ag clubs, student groups or campus events. Market to working farmers, business owners and the businesses around them instead. (Andy's own classes, handled by the School bot, are not affected.)
