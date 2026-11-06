@@ -31,6 +31,7 @@ NASS_API_KEY=yourkey python -m costwire.nass_land   # yearly cash rents + land v
 python -m costwire.changes       # price vs 2 weeks ago and 1 year ago -> data/changes.csv
 python -m costwire.brief         # weekly brief -> briefs/<date>.md and .html (add --date 2026-11-02 for a set date)
 python -m costwire.site          # build the website into site/ (open site/index.html)
+python -m costwire.launch_check # what is ready / still missing before launch (see docs/launch-checklist.md)
 python -m costwire.weekly        # all of the above in one go (what the Monday GitHub job runs)
 ```
 

@@ -18,4 +18,4 @@ One step per weekly build session. Do the first unchecked step, then check it of
 - [x] 11. Email: send the weekly brief through Resend to a test address only (Andy). Key from env var `RESEND_API_KEY`. Do NOT email real subscribers until Andy says so.
 - [x] 12. Signup form wired to a free list (Resend audience or Google Sheet). Andy approves before going live.
 - [x] 13. Accuracy check script: every number in the brief has a source + date; flag anything missing. Runs before each build.
-- [ ] 14. Polish + launch checklist for Andy.
+- [x] 14. Polish + launch checklist for Andy.

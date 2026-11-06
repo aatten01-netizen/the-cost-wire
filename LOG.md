@@ -2,6 +2,22 @@
 
 Newest first.
 
+## 2026-11-06 — Step 14: Polish + launch checklist
+**What I built**
+- `src/costwire/launch_check.py`: prints a ready / not-ready list for launch (Iowa + Illinois prices, EIA fuel, feed line, cash rent data, a brief, accuracy check, website pages, test-email settings, signup form live). Each missing item says what to do. `--strict` exits 1 if anything is missing.
+- `docs/launch-checklist.md`: the numbered list of everything only you can do, with links, in order.
+- README mentions both. 4 new tests (`tests/test_launch_check.py`). 152 pass.
+
+**Right now the check says 5 of 10 ready.** Missing: EIA fuel (no key), feed line (no PDF, Step 10b), cash rent data (no NASS key), test-email settings, signup live.
+
+**How to try it**
+`PYTHONPATH=src python -m costwire.launch_check`
+
+**What Andy needs to do**
+Follow `docs/launch-checklist.md`. The top three: (1) fix GitHub Actions billing https://github.com/settings/billing (2) add secrets `EIA_API_KEY` and `NASS_API_KEY` https://github.com/aatten01-netizen/the-cost-wire/settings/secrets/actions (3) upload `tests/samples/ams_3618.pdf` https://github.com/aatten01-netizen/the-cost-wire/upload/main/tests/samples
+
+**Next:** Step 10b once the PDF is uploaded. All other steps are done.
+
 ## 2026-11-06 — QA (Cost Wire)
 **Checked:** full test suite (147 pass; the 6 "real PDF" failures in the old log were a broken system `cryptography`/`cffi` in the sandbox, fixed with `pip install cffi cryptography`, not a code bug), accuracy check passes, site rebuilt, all 4 pages checked at phone width (375px, no sideways scroll, disclaimer present).
 **Fixed:** the committed `site/` was out of date: no `cash-rent.html` page and no "Cash rent" nav link on the other pages. Rebuilt it and added a test that every page links to it.
