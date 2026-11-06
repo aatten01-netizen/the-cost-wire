@@ -67,3 +67,15 @@ def test_works_on_real_brief_html(tmp_path):
     site.build_site(d, out)
     index = (out / "index.html").read_text()
     assert '<nav class="sitenav">' in index and "Cost Wire" in index and ".signup" in index
+
+
+def test_every_page_links_to_cash_rent_and_has_disclaimer(tmp_path):
+    d = make_briefs(tmp_path, ["2026-11-02.html"])
+    out = tmp_path / "site"
+    site.build_site(d, out)
+    pages = ["index.html", "archive.html", "cash-rent.html", "briefs/2026-11-02.html"]
+    for p in pages:
+        text = (out / p).read_text(encoding="utf-8")
+        assert "cash-rent.html" in text, p
+    # the cash rent page exists even before any NASS data is loaded
+    assert "not loaded yet" in (out / "cash-rent.html").read_text(encoding="utf-8")

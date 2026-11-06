@@ -2,6 +2,12 @@
 
 Newest first.
 
+## 2026-11-06 — QA (Cost Wire)
+**Checked:** full test suite (147 pass; the 6 "real PDF" failures in the old log were a broken system `cryptography`/`cffi` in the sandbox, fixed with `pip install cffi cryptography`, not a code bug), accuracy check passes, site rebuilt, all 4 pages checked at phone width (375px, no sideways scroll, disclaimer present).
+**Fixed:** the committed `site/` was out of date: no `cash-rent.html` page and no "Cash rent" nav link on the other pages. Rebuilt it and added a test that every page links to it.
+**Verify:** `PYTHONPATH=src python -m costwire.site` should leave `git status` clean; `python -m pytest`.
+**Andy:** nothing new. Still open: Step 10b PDF, NASS key (cash rent page says "not loaded yet").
+
 ## 2026-11-06 — Step 13: Accuracy check script (night shift)
 **What I built**
 - `src/costwire/accuracy.py`: checks the saved prices (item, unit, real price above zero, real date not in the future, source name and https source link) and then checks the newest brief row by row against the data: price, date, 2-week and 1-year change and source link must match exactly. It also fails if a row is missing, invented or duplicated, if an earlier price used for a change has no source or date, or if the Sources section or disclaimer is missing. Problems print in plain English and it exits 1.
