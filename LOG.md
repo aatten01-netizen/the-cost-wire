@@ -2,6 +2,21 @@
 
 Newest first.
 
+## 2026-11-06 — Step 13: Accuracy check script (night shift)
+**What I built**
+- `src/costwire/accuracy.py`: checks the saved prices (item, unit, real price above zero, real date not in the future, source name and https source link) and then checks the newest brief row by row against the data: price, date, 2-week and 1-year change and source link must match exactly. It also fails if a row is missing, invented or duplicated, if an earlier price used for a change has no source or date, or if the Sources section or disclaimer is missing. Problems print in plain English and it exits 1.
+- `weekly.py`: the check now runs after the brief and before the site build, so a bad number stops the build and nothing is published.
+- 11 new tests (`tests/test_accuracy.py`, plus one in `test_weekly.py`). 141 pass; the same 6 real-PDF tests fail in this sandbox only (PDF library problem, see Step 9). The check passes on the current real brief.
+
+**How to try it**
+`python -m costwire.accuracy` (checks the newest brief), or `--brief briefs/2026-11-02.md`.
+
+**What Andy needs to do**
+1. Step 10b still needs `tests/samples/ams_3618.pdf`: https://github.com/aatten01-netizen/the-cost-wire/upload/main/tests/samples
+2. Still open: GitHub billing, EIA/NASS/Resend keys, Pages decision, signup sheet (Step 12).
+
+**Next:** Step 14 (polish + launch checklist), or 10b once the PDF is uploaded.
+
 ## 2026-11-05 — Step 12: Signup form wired to a free Google Sheet (stays OFF until you say go)
 **What I built**
 - `site.py`: the signup box is still the "coming soon" placeholder. It turns into a real email form ONLY when both build settings are present: `SIGNUP_FORM_URL` (an https link) and `SIGNUP_LIVE=yes`. Missing either one, or a non-https link, keeps the placeholder. The live form has a hidden bot-trap field and stores only an email.

@@ -17,5 +17,5 @@ One step per weekly build session. Do the first unchecked step, then check it of
 - [ ] 10b. Check the feed parser against the real PDF in `tests/samples/ams_3618.pdf` (from the "Fetch sample reports" Action, or Andy uploads it). Fix the parser if the real text differs, add a real-PDF test, then load the real prices into `data/fertilizer.csv`.
 - [x] 11. Email: send the weekly brief through Resend to a test address only (Andy). Key from env var `RESEND_API_KEY`. Do NOT email real subscribers until Andy says so.
 - [x] 12. Signup form wired to a free list (Resend audience or Google Sheet). Andy approves before going live.
-- [ ] 13. Accuracy check script: every number in the brief has a source + date; flag anything missing. Runs before each build.
+- [x] 13. Accuracy check script: every number in the brief has a source + date; flag anything missing. Runs before each build.
 - [ ] 14. Polish + launch checklist for Andy.

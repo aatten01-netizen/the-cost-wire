@@ -100,3 +100,11 @@ def test_deploy_waits_for_andy_to_turn_pages_on():
     deploy = wf["jobs"]["deploy"]
     assert "PAGES_ENABLED" in deploy["if"]
     assert deploy["needs"] == "build"
+
+
+def test_accuracy_failure_stops_before_site():
+    calls = []
+    steps = fake_steps({"accuracy": 1}, calls)
+    steps["accuracy"] = lambda: (calls.append("accuracy"), 1)[1]
+    assert weekly.run(date(2026, 11, 9), steps) == 1
+    assert calls == ["pull", "changes", "brief", "accuracy"]
