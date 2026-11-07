@@ -2,6 +2,13 @@
 
 Newest first.
 
+## 2026-11-07 — Marketing session (Cost Wire)
+**What I did:** All PLAN steps were already done, so no build step. Created `marketing/MARKETING-PLAN.md` (buyer, communities, competitors, offer, 11-asset checklist) and asset 1: `marketing/landing-page-copy.md`.
+**Note:** Competitor prices are NOT verified (not found online); the plan says not to quote them until checked.
+Marketing: landing page copy - Andy: reply SEND/POST in chat to have it sent
+**Andy:** same launch-checklist items; please check DTN/farmdoc pricing pages so we can fill competitor prices.
+**Next:** asset 2 (outreach messages).
+
 ## 2026-11-07 — Step 10b: Check the feed parser against the real PDF (night shift)
 **What I built**
 - Ran the feed parser on the real `tests/samples/ams_3618.pdf` (report for 10/26-10/30/2026, released Nov 2). It read the real layout correctly with no changes: dried distillers grains 10% = IL $195.00, IA $170.65, MN $175.00, WI $174.00 per ton (not the wet table, not the $/bu column).
