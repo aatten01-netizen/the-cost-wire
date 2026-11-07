@@ -117,3 +117,24 @@ def test_site_builds_cash_rent_page(tmp_path):
     page = (out / "cash-rent.html").read_text()
     assert "$210" in page and 'href="index.html"' in page and "Cash rent" in page
     assert 'cash-rent.html' in (out / "index.html").read_text()
+
+
+def test_main_returns_0_when_pull_works(monkeypatch):
+    monkeypatch.setattr(nass_land, "pull", lambda: [])
+    assert nass_land.main() == 0
+
+
+def test_main_returns_1_and_hides_error_details(monkeypatch, capsys):
+    def boom():
+        raise RuntimeError("secret-key-123 in url")
+    monkeypatch.setattr(nass_land, "pull", boom)
+    assert nass_land.main() == 1
+    err = capsys.readouterr().err
+    assert "RuntimeError" in err and "secret-key-123" not in err
+
+
+def test_failed_query_message_never_contains_key(tmp_path, capsys):
+    def bad(url, params):
+        raise ConnectionError(f"failed {params['key']}")
+    nass_land.pull(get_json=bad, api_key="SECRETKEY", out=tmp_path / "l.csv", states=["IA"])
+    assert "SECRETKEY" not in capsys.readouterr().err

@@ -2,6 +2,11 @@
 
 Newest first.
 
+## 2026-11-07 — QA (the-cost-wire)
+**Checked:** full test suite (153 passed; sandbox needed `pip install cffi` for pdfplumber, not a repo bug), all 4 site pages at phone width (no sideways scroll, viewport tag + disclaimer on each), advice-wording search (none found).
+**Fixed/added:** removed an unused variable in `nass_land.main()`; added 3 tests (exit codes, API key never printed in errors). Now 156 tests.
+**Verify:** `python -m pytest`
+
 ## 2026-11-07 — Marketing session (Cost Wire)
 **What I did:** All PLAN steps were already done, so no build step. Created `marketing/MARKETING-PLAN.md` (buyer, communities, competitors, offer, 11-asset checklist) and asset 1: `marketing/landing-page-copy.md`.
 **Note:** Competitor prices are NOT verified (not found online); the plan says not to quote them until checked.

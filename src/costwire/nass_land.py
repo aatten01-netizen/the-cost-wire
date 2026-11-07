@@ -206,7 +206,7 @@ def pull(get_json=None, api_key=None, today=None, out=None, states=None) -> list
 
 def main() -> int:
     try:
-        records = pull()
+        pull()
     except Exception as exc:
         print(f"NASS pull failed: {type(exc).__name__}", file=sys.stderr)
         return 1
