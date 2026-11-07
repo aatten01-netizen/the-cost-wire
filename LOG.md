@@ -2,6 +2,20 @@
 
 Newest first.
 
+## 2026-11-07 — Step 10b: Check the feed parser against the real PDF (night shift)
+**What I built**
+- Ran the feed parser on the real `tests/samples/ams_3618.pdf` (report for 10/26-10/30/2026, released Nov 2). It read the real layout correctly with no changes: dried distillers grains 10% = IL $195.00, IA $170.65, MN $175.00, WI $174.00 per ton (not the wet table, not the $/bu column).
+- Added a real-PDF test (`tests/test_feed.py`). 153 tests pass.
+- Loaded the 4 real prices into `data/fertilizer.csv` (dated 2026-11-02, the report's release date) and rebuilt the Nov 2 brief and site. The feed row now shows in the brief; accuracy check passes.
+
+**How to try it**
+`python -m pytest`, then `PYTHONPATH=src python -m costwire.launch_check` (feed line should now be ready).
+
+**What Andy needs to do**
+Same open items: GitHub billing, `EIA_API_KEY` and `NASS_API_KEY` secrets, Resend test settings, signup sheet. See `docs/launch-checklist.md`.
+
+**Next:** All PLAN steps are done. Remaining work is Andy's keys; there is no "From market scan" section yet.
+
 ## 2026-11-06 — Step 14: Polish + launch checklist
 **What I built**
 - `src/costwire/launch_check.py`: prints a ready / not-ready list for launch (Iowa + Illinois prices, EIA fuel, feed line, cash rent data, a brief, accuracy check, website pages, test-email settings, signup form live). Each missing item says what to do. `--strict` exits 1 if anything is missing.

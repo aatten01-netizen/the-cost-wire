@@ -125,3 +125,18 @@ def test_feed_row_shows_in_the_brief(tmp_path, monkeypatch):
     assert "Wisconsin" in md and "Minnesota" in md
     assert feed.SOURCE_NAME in md
     assert "USDA Agricultural Marketing Service" in b["credit"]
+
+
+def test_real_feed_pdf_report_dated_nov_2_2026():
+    """The real report Andy uploaded (tests/samples/ams_3618.pdf)."""
+    from pathlib import Path
+
+    pdf = (Path(__file__).parent / "samples" / "ams_3618.pdf").read_bytes()
+    records = feed.parse_report_pdf(pdf)
+    prices = {r.region: r.price for r in records}
+    # Dried 10% table, $/ton (not the wet table, not the $/bu value column).
+    assert prices == {"IL": 195.00, "IA": 170.65, "MN": 175.00, "WI": 174.00}
+    for r in records:
+        assert r.item == "ddgs" and r.unit == "$/ton"
+        assert r.as_of == date(2026, 11, 2)
+        assert r.source_url == "https://www.ams.usda.gov/mnreports/ams_3618.pdf"
