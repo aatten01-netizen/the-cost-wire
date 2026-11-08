@@ -2,6 +2,13 @@
 
 Newest first.
 
+## 2026-11-08 — Marketing session (night shift, Cost Wire)
+**Build step:** none. All PLAN steps are done and there is no "From market scan" section yet.
+**Made:** asset 2, `marketing/outreach-messages.md`: 5 drafts (Brownfield, Farm Week, RFD-TV, Wisconsin State Farmer, Iowa Farmer Today). No FFA/schools. Sandbox couldn't open the sites, so Andy must confirm each contact page; no addresses guessed.
+Marketing: outreach messages - Andy: reply SEND/POST in chat to have it sent
+**Andy:** same launch-checklist items (site must be live for [LINK]).
+**Next:** asset 3 (AgTalk post).
+
 ## 2026-11-07 — QA (the-cost-wire)
 **Checked:** full test suite (153 passed; sandbox needed `pip install cffi` for pdfplumber, not a repo bug), all 4 site pages at phone width (no sideways scroll, viewport tag + disclaimer on each), advice-wording search (none found).
 **Fixed/added:** removed an unused variable in `nass_land.main()`; added 3 tests (exit codes, API key never printed in errors). Now 156 tests.

@@ -21,7 +21,7 @@ Free weekly brief (web + email). Later paid tier (~$9-15/month per BRIEF.md): yo
 
 ## Asset checklist
 - [x] 1. Landing page copy (marketing/landing-page-copy.md)
-- [ ] 2. 5 outreach messages to real public prospects (ag radio/news desks, extension-independent ag newsletters, farm-management firms) — public contact pages only
+- [x] 2. (marketing/outreach-messages.md) 5 outreach messages to real public prospects (ag radio/news desks, extension-independent ag newsletters, farm-management firms) — public contact pages only
 - [ ] 3. AgTalk post (value-first, with forum rules)
 - [ ] 4. Reddit r/farming post (value-first, with sidebar rules)
 - [ ] 5. Short-video script: "What fall anhydrous did this week"
