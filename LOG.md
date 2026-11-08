@@ -2,6 +2,10 @@
 
 Newest first.
 
+## 2026-11-08 — LIVE (Andy + Claude in chat)
+**Live:** https://aatten01-netizen.github.io/the-cost-wire/ . Andy made the repo public (fixes the Actions billing block; free Actions + Pages) and set Pages to GitHub Actions; Claude added `PAGES_ENABLED=true`, ran "Fetch sample reports" (success) and "Weekly brief" #1 (success: build + deploy). First brief shows Iowa/Illinois fertilizer + diesel + propane, DDGS for IA/IL/MN/WI, and EIA Midwest diesel/propane, all sourced and dated.
+**Still open for Andy:** cash rent (needs `NASS_API_KEY` secret if not added yet), email test (Resend), signup form. Step 10b (feed line) can run now that sample reports were fetched.
+
 ## 2026-11-08 — Marketing session (Cost Wire, asset 3)
 **Build step:** none. All PLAN steps are done.
 **Made:** `marketing/agtalk-post.md`: value-first AgTalk post using only numbers from the Nov 2 brief, each with its USDA source link. I could not open AgTalk, so its self-promo rules are NOT verified; the file has a "check before posting" list.
