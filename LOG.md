@@ -2,6 +2,13 @@
 
 Newest first.
 
+## 2026-11-08 — Marketing session (Cost Wire, asset 3)
+**Build step:** none. All PLAN steps are done.
+**Made:** `marketing/agtalk-post.md`: value-first AgTalk post using only numbers from the Nov 2 brief, each with its USDA source link. I could not open AgTalk, so its self-promo rules are NOT verified; the file has a "check before posting" list.
+Marketing: AgTalk post - Andy: reply SEND/POST in chat to have it sent
+**Andy:** same launch-checklist items (site must be live for [LINK]); read AgTalk's rules before posting.
+**Next:** asset 4 (Reddit r/farming post).
+
 ## 2026-11-08 — Marketing session (night shift, Cost Wire)
 **Build step:** none. All PLAN steps are done and there is no "From market scan" section yet.
 **Made:** asset 2, `marketing/outreach-messages.md`: 5 drafts (Brownfield, Farm Week, RFD-TV, Wisconsin State Farmer, Iowa Farmer Today). No FFA/schools. Sandbox couldn't open the sites, so Andy must confirm each contact page; no addresses guessed.
