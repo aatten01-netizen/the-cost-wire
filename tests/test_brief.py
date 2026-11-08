@@ -148,3 +148,8 @@ def test_credit_names_only_agencies_in_the_brief():
     assert "EIA" not in brief.credit_line([usda])
     assert brief.credit_line([usda, eia]) == ("Data: USDA Agricultural Marketing Service (AMS) and "
                                               "U.S. Energy Information Administration (EIA).")
+
+
+def test_table_rows_group_states_in_order_with_regional_last():
+    rows = [{"region": r, "item": "ddgs"} for r in ["WI", "PADD2", "IL", "MN", "IA"]]
+    assert [r["region"] for r in sorted(rows, key=brief.sort_key)] == ["IA", "IL", "MN", "WI", "PADD2"]

@@ -2,6 +2,11 @@
 
 Newest first.
 
+## 2026-11-08 — QA (the-cost-wire)
+**Checked:** 156 tests pass; accuracy check passes; all 5 site pages at 375px (no sideways scroll, disclaimer on each, no broken local links); no advice wording; no duplicate rows in `data/fertilizer.csv`.
+**Fixed:** brief table sorted regions by code, so Wisconsin feed landed after the Midwest (PADD 2) fuel rows. Now states first (IA, IL, MN, WI), regional averages last. Added 1 test (157 total). Rebuilt the Nov 8 brief and site; accuracy check still passes.
+**Verify:** `PYTHONPATH=src python3 -m pytest` (needs `pip install pytest requests pdfplumber pyyaml cffi`).
+
 ## 2026-11-08 — LIVE (Andy + Claude in chat)
 **Live:** https://aatten01-netizen.github.io/the-cost-wire/ . Andy made the repo public (fixes the Actions billing block; free Actions + Pages) and set Pages to GitHub Actions; Claude added `PAGES_ENABLED=true`, ran "Fetch sample reports" (success) and "Weekly brief" #1 (success: build + deploy). First brief shows Iowa/Illinois fertilizer + diesel + propane, DDGS for IA/IL/MN/WI, and EIA Midwest diesel/propane, all sourced and dated.
 **Still open for Andy:** cash rent (needs `NASS_API_KEY` secret if not added yet), email test (Resend), signup form. Step 10b (feed line) can run now that sample reports were fetched.

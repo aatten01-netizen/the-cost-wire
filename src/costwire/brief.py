@@ -105,9 +105,14 @@ def signed_change(dollars, pct) -> str:
     return text
 
 
+# States first (in the order of REGION_NAMES), regional averages like PADD 2 last.
+REGION_ORDER = list(REGION_NAMES)
+
+
 def sort_key(r: dict) -> tuple:
     order = ITEM_ORDER.index(r["item"]) if r["item"] in ITEM_ORDER else len(ITEM_ORDER)
-    return (r["region"], order, r["item"])
+    reg = REGION_ORDER.index(r["region"]) if r["region"] in REGION_ORDER else len(REGION_ORDER)
+    return (reg, r["region"], order, r["item"])
 
 
 # ---------- the content ----------
