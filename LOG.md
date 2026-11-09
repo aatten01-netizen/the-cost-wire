@@ -2,6 +2,13 @@
 
 Newest first.
 
+## 2026-11-09 — Marketing session (Cost Wire, asset 5)
+**Build step:** none. All PLAN steps are done and there is no "From market scan" section.
+**Made:** `marketing/video-script.md`: 30-second script using only Nov 8 brief numbers (Iowa/Illinois anhydrous, EIA diesel), each sourced. No week-over-week change exists yet, so Version A shows price + source only; Version B (for the 2-week change) is ready once the Nov 22 brief has one.
+Marketing: short-video script - Andy: reply SEND/POST in chat to have it sent
+**Andy:** record in your own voice; swap in the newest brief's numbers if later.
+**Next:** asset 6 (SEO article on cash rent by county).
+
 ## 2026-11-09 — Marketing session (night shift, Cost Wire)
 **Build step:** none. All PLAN steps are done and there is no "From market scan" section.
 **Made:** asset 4, `marketing/reddit-post.md`: value-first r/farming post using only Nov 8 brief numbers (USDA/EIA, each sourced), with disclosure line and reply prep. Reddit was unreachable from the sandbox, so r/farming's self-promo rules are NOT verified; the file has a check-before-posting list.
