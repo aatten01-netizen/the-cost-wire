@@ -2,6 +2,13 @@
 
 Newest first.
 
+## 2026-11-09 — Marketing session (night shift, Cost Wire)
+**Build step:** none. All PLAN steps are done and there is no "From market scan" section.
+**Made:** asset 4, `marketing/reddit-post.md`: value-first r/farming post using only Nov 8 brief numbers (USDA/EIA, each sourced), with disclosure line and reply prep. Reddit was unreachable from the sandbox, so r/farming's self-promo rules are NOT verified; the file has a check-before-posting list.
+Marketing: Reddit r/farming post - Andy: reply SEND/POST in chat to have it sent
+**Andy:** read r/farming's rules before posting.
+**Next:** asset 5 (short-video script).
+
 ## 2026-11-08 — QA (the-cost-wire)
 **Checked:** 156 tests pass; accuracy check passes; all 5 site pages at 375px (no sideways scroll, disclaimer on each, no broken local links); no advice wording; no duplicate rows in `data/fertilizer.csv`.
 **Fixed:** brief table sorted regions by code, so Wisconsin feed landed after the Midwest (PADD 2) fuel rows. Now states first (IA, IL, MN, WI), regional averages last. Added 1 test (157 total). Rebuilt the Nov 8 brief and site; accuracy check still passes.

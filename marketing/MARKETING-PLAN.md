@@ -23,7 +23,7 @@ Free weekly brief (web + email). Later paid tier (~$9-15/month per BRIEF.md): yo
 - [x] 1. Landing page copy (marketing/landing-page-copy.md)
 - [x] 2. (marketing/outreach-messages.md) 5 outreach messages to real public prospects (ag radio/news desks, extension-independent ag newsletters, farm-management firms) — public contact pages only
 - [x] 3. AgTalk post (marketing/agtalk-post.md)
-- [ ] 4. Reddit r/farming post (value-first, with sidebar rules)
+- [x] 4. Reddit r/farming post (value-first, with sidebar rules)
 - [ ] 5. Short-video script: "What fall anhydrous did this week"
 - [ ] 6. SEO article: "Midwest cash rent by county: where to find the real numbers"
 - [ ] 7. SEO article: "Iowa and Illinois fertilizer prices vs last year"
