@@ -2,6 +2,13 @@
 
 Newest first.
 
+## 2026-11-10 — Marketing session (night shift, Cost Wire)
+**Build step:** none. All PLAN steps are done and there is no "From market scan" section.
+**Made:** asset 6, `marketing/seo-cash-rent-article.md`: SEO article on finding NASS cash rent by county. No dollar figures, because the cash rent page has no data loaded yet (never guess a number). It has a marked spot for a sourced table.
+Marketing: SEO cash rent article - Andy: reply SEND/POST in chat to have it sent
+**Andy:** set `NASS_API_KEY` so the table can be filled; confirm the Quick Stats click path.
+**Next:** asset 7 (SEO article on Iowa/Illinois fertilizer vs last year).
+
 ## 2026-11-09 — Marketing session (Cost Wire, asset 5)
 **Build step:** none. All PLAN steps are done and there is no "From market scan" section.
 **Made:** `marketing/video-script.md`: 30-second script using only Nov 8 brief numbers (Iowa/Illinois anhydrous, EIA diesel), each sourced. No week-over-week change exists yet, so Version A shows price + source only; Version B (for the 2-week change) is ready once the Nov 22 brief has one.

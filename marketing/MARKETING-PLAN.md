@@ -25,7 +25,7 @@ Free weekly brief (web + email). Later paid tier (~$9-15/month per BRIEF.md): yo
 - [x] 3. AgTalk post (marketing/agtalk-post.md)
 - [x] 4. Reddit r/farming post (value-first, with sidebar rules)
 - [x] 5. Short-video script (marketing/video-script.md)
-- [ ] 6. SEO article: "Midwest cash rent by county: where to find the real numbers"
+- [x] 6. SEO article: "Midwest cash rent by county: where to find the real numbers"
 - [ ] 7. SEO article: "Iowa and Illinois fertilizer prices vs last year"
 - [ ] 8. Cross-promo offer for Commodity Wire list
 - [ ] 9. Referral offer (forward-to-a-neighbor)
