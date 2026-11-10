@@ -2,6 +2,13 @@
 
 Newest first.
 
+## 2026-11-10 — Marketing session (Cost Wire, asset 7)
+**Build step:** none. All PLAN steps are done and there is no "From market scan" section.
+**Made:** asset 7, `marketing/seo-fertilizer-vs-last-year.md`: SEO article on Iowa/Illinois fertilizer. Uses only Oct 30, 2026 USDA prices (from the Nov 9 brief, each sourced). No year-ago numbers exist in our data, so it has a marked spot for a year-ago table and a how-to for finding last year's report. No up/down claims.
+Marketing: SEO fertilizer vs last year article - Andy: reply SEND/POST in chat to have it sent
+**Andy:** confirm the USDA Market News click path; year-ago rows must come from the archived 2025 reports.
+**Next:** asset 8 (cross-promo offer for the Commodity Wire list).
+
 ## 2026-11-10 — Marketing session (night shift, Cost Wire)
 **Build step:** none. All PLAN steps are done and there is no "From market scan" section.
 **Made:** asset 6, `marketing/seo-cash-rent-article.md`: SEO article on finding NASS cash rent by county. No dollar figures, because the cash rent page has no data loaded yet (never guess a number). It has a marked spot for a sourced table.
