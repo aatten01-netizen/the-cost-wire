@@ -2,6 +2,13 @@
 
 Newest first.
 
+## 2026-11-11 — Market-scan step: bushels of corn to buy 1 ton (night shift)
+**Built:** the affordability line. `src/costwire/corn_price.py` pulls the USDA NASS monthly corn price received for Iowa and Illinois (Quick Stats, key from `NASS_API_KEY`, skips cleanly without it) into `data/corn_price.csv`. `src/costwire/affordability.py` divides the AMS anhydrous, urea and UAN 28% price by that state's newest NASS corn month (no later than the fertilizer date, at most 3 months older), and does the same for 1 year ago (year-ago AMS price ÷ same month a year earlier). The brief gets a "Bushels of corn to buy 1 ton" section, NASS links in Sources and NASS in the credit line. Missing either number = the line (or the year-ago part) is left out. The accuracy check now also re-checks every bushels line and the NASS links. The weekly job runs the corn pull after cash rents; a failure never stops the brief. 13 new tests (170 total, all pass).
+**Try it:** `PYTHONPATH=src python -m pytest -q`; with a key: `NASS_API_KEY=... PYTHONPATH=src python -m costwire.corn_price` then `python -m costwire.brief`.
+**Andy:** the section stays hidden until `NASS_API_KEY` is set as a repo secret (same key as cash rent; still not set as far as this log shows). The year-ago part also needs ~1 year of saved AMS prices, so it will show "n/a"-style omission for now. Not verified against a live NASS reply (no key in the sandbox): first real run, glance at the section.
+Marketing: Commodity Wire cross-promo offer (marketing/cross-promo-commodity-wire.md) - Andy: reply SEND/POST in chat to have it sent
+**Next:** market-scan step 2: 12-week price trend SVG per fertilizer on the brief page. Marketing asset 9 (referral offer).
+
 ## 2026-11-10 — Marketing session (Cost Wire, asset 7)
 **Build step:** none. All PLAN steps are done and there is no "From market scan" section.
 **Made:** asset 7, `marketing/seo-fertilizer-vs-last-year.md`: SEO article on Iowa/Illinois fertilizer. Uses only Oct 30, 2026 USDA prices (from the Nov 9 brief, each sourced). No year-ago numbers exist in our data, so it has a marked spot for a year-ago table and a how-to for finding last year's report. No up/down claims.

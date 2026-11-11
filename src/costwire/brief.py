@@ -24,7 +24,7 @@ import sys
 from datetime import date, datetime
 from zoneinfo import ZoneInfo
 
-from . import changes
+from . import affordability, changes, corn_price
 from .paths import BRIEFS_DIR
 
 ITEM_NAMES = {
@@ -179,27 +179,82 @@ def sources(results: list[dict]) -> list[dict]:
     return [{"name": n, "url": u, "as_of": d} for (n, u), d in sorted(found.items())]
 
 
-def credit_line(srcs: list[dict]) -> str:
+def credit_line(srcs: list[dict], nass: bool = False) -> str:
     """Credit only the agencies whose numbers are actually in this brief."""
     names = " ".join(s["name"] for s in srcs)
     agencies = []
     if "USDA" in names:
         agencies.append("USDA Agricultural Marketing Service (AMS)")
+    if nass:
+        agencies.append("USDA National Agricultural Statistics Service (NASS)")
     if "EIA" in names or "Energy Information" in names:
         agencies.append("U.S. Energy Information Administration (EIA)")
-    return "Data: " + " and ".join(agencies) + "." if agencies else ""
+    if not agencies:
+        return ""
+    joined = agencies[0] if len(agencies) == 1 else ", ".join(agencies[:-1]) + " and " + agencies[-1]
+    return "Data: " + joined + "."
 
 
-def build(results: list[dict], brief_date: date) -> dict:
+def month_label(corn) -> str:
+    return f"{date(corn.year, corn.month, 1):%b %Y}"
+
+
+AFFORD_TITLE = "Bushels of corn to buy 1 ton"
+AFFORD_NOTE = ("Fertilizer price (USDA AMS) divided by the state's average corn price "
+               "received by farmers for the newest month NASS has published (USDA NASS). "
+               "Left out when either number is missing.")
+
+
+def afford_line(a: dict) -> str:
+    """One plain sentence per fertilizer + state. Numbers only, no advice."""
+    name = f"{region_name(a['region'])} {item_in_sentence(a['item'])}"
+    corn = a["corn"]
+    text = (f"{name}: {a['bushels']:,.1f} bushels of corn per ton "
+            f"({money(a['fert_price'])}/ton as of {short_date(a['fert_as_of'])} "
+            f"÷ {money(corn.value)}/bu {region_name(a['region'])} corn price received, "
+            f"{month_label(corn)})")
+    if a["bushels_1y"] is not None:
+        diff = a["change_1y"]
+        way = ("the same as" if diff == 0 else
+               f"{abs(diff):,.1f} {'more' if diff > 0 else 'fewer'} bushels than")
+        text += (f"; {way} 1 year earlier: {a['bushels_1y']:,.1f} bushels "
+                 f"({money(a['fert_price_1y'])}/ton as of {short_date(a['fert_as_of_1y'])} "
+                 f"÷ {money(a['corn_1y'].value)}/bu, {month_label(a['corn_1y'])})")
+    return text + "."
+
+
+def afford_sources(afford: list[dict]) -> list[dict]:
+    """The NASS corn price queries used, one per state, with the months used."""
+    found = {}
+    for a in afford:
+        for corn in (a["corn"], a["corn_1y"]):
+            if corn is None:
+                continue
+            entry = found.setdefault(corn.source_url, {"name": corn.source_name,
+                                                        "url": corn.source_url,
+                                                        "state": corn.state, "months": set()})
+            entry["months"].add((corn.year, corn.month))
+    out = []
+    for e in sorted(found.values(), key=lambda e: e["url"]):
+        months = ", ".join(f"{date(y, m, 1):%b %Y}" for y, m in sorted(e["months"]))
+        out.append({"name": e["name"], "url": e["url"],
+                    "what": f"{region_name(e['state'])} corn price received, {months}"})
+    return out
+
+
+def build(results: list[dict], brief_date: date, corn_prices=None) -> dict:
     """Everything the templates need, in one dict."""
     rows = sorted(results, key=sort_key)
+    afford = affordability.compute(results, corn_prices or [])
     return {
         "date": brief_date,
         "headline": headline(rows),
         "rows": rows,
         "lines": [what_changed(r) for r in rows],
+        "afford": [afford_line(a) for a in afford],
+        "afford_sources": afford_sources(afford),
         "sources": sources(rows),
-        "credit": credit_line(sources(rows)),
+        "credit": credit_line(sources(rows), nass=bool(afford)),
     }
 
 
@@ -220,9 +275,13 @@ def to_markdown(b: dict) -> str:
     out += ["", "n/a = no earlier price saved yet for that date, so no change is shown.", "",
             "## What changed", ""]
     out += [f"- {line}" for line in b["lines"]]
+    if b.get("afford"):
+        out += ["", f"## {AFFORD_TITLE}", "", AFFORD_NOTE, ""]
+        out += [f"- {line}" for line in b["afford"]]
     out += ["", "## Sources", ""]
     out += [f"- [{s['name']}]({s['url']}) — data as of {short_date(s['as_of'])}"
             for s in b["sources"]]
+    out += [f"- [{s['name']}]({s['url']}) — {s['what']}" for s in b.get("afford_sources", [])]
     out += ["", b["credit"], "", f"*{DISCLAIMER}*", ""]
     return "\n".join(out)
 
@@ -243,6 +302,13 @@ def to_html(b: dict) -> str:
     srcs = "\n".join(
         f"<li><a href=\"{e(s['url'])}\">{e(s['name'])}</a> — data as of {e(short_date(s['as_of']))}</li>"
         for s in b["sources"])
+    srcs += "".join(f"\n<li><a href=\"{e(s['url'])}\">{e(s['name'])}</a> — {e(s['what'])}</li>"
+                    for s in b.get("afford_sources", []))
+    afford = ""
+    if b.get("afford"):
+        items = "\n".join(f"<li>{e(line)}</li>" for line in b["afford"])
+        afford = (f"<h2>{e(AFFORD_TITLE)}</h2>\n<p class=\"note\">{e(AFFORD_NOTE)}</p>\n"
+                  f"<ul>\n{items}\n</ul>\n")
     return f"""<!doctype html>
 <html lang="en">
 <head>
@@ -274,7 +340,7 @@ td.num {{ text-align: right; white-space: nowrap; }}
 <ul>
 {lines}
 </ul>
-<h2>Sources</h2>
+{afford}<h2>Sources</h2>
 <ul>
 {srcs}
 </ul>
@@ -291,12 +357,12 @@ def today_central() -> date:
     return datetime.now(ZoneInfo("America/Chicago")).date()
 
 
-def write_brief(brief_date: date, in_path=None, out_dir=None):
+def write_brief(brief_date: date, in_path=None, out_dir=None, corn_path=None):
     """Build the brief from saved prices. Returns (md_path, html_path), or None if no data."""
     rows = changes.read_rows(in_path)
     if not rows:
         return None
-    b = build(changes.compute(rows), brief_date)
+    b = build(changes.compute(rows), brief_date, corn_price.load_prices(corn_path))
     out_dir = out_dir or BRIEFS_DIR
     out_dir.mkdir(parents=True, exist_ok=True)
     md_path = out_dir / f"{brief_date.isoformat()}.md"

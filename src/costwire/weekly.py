@@ -22,7 +22,7 @@ from datetime import date, datetime, timezone
 from zoneinfo import ZoneInfo
 
 from .paths import BRIEFS_DIR
-from . import accuracy, brief, changes, nass_land, pull_fertilizer, site
+from . import accuracy, brief, changes, corn_price, nass_land, pull_fertilizer, site
 
 CENTRAL = ZoneInfo("America/Chicago")
 RUN_WEEKDAY = 0  # Monday
@@ -40,6 +40,7 @@ def run(brief_date: date, steps=None) -> int:
     steps = steps or {
         "pull": pull_fertilizer.main,
         "land": nass_land.main,
+        "corn": corn_price.main,
         "changes": changes.main,
         "brief": lambda: brief.main(["--date", brief_date.isoformat()]),
         "accuracy": lambda: accuracy.main(["--brief", str(BRIEFS_DIR / f"{brief_date.isoformat()}.md")]),
@@ -53,6 +54,9 @@ def run(brief_date: date, steps=None) -> int:
     if "land" in steps and steps["land"]() != 0:
         print("NASS cash rent / land value pull failed; using what is already saved.",
               file=sys.stderr)
+    # Monthly corn price (for bushels per ton): a failure here never stops the brief.
+    if "corn" in steps and steps["corn"]() != 0:
+        print("NASS corn price pull failed; using what is already saved.", file=sys.stderr)
     # Accuracy check sits between the brief and the site: a bad number stops the build.
     for name in ("changes", "brief", "accuracy", "site"):
         if name not in steps:

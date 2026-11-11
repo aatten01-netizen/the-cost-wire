@@ -8,6 +8,9 @@ Runs before each weekly build. It checks two things:
      the saved data exactly (price, date, change, source link), the brief must
      have a Sources section and the disclaimer, and it must not hold a row we
      can't trace back to the data.
+  3. The "bushels of corn to buy 1 ton" lines: each must match the saved
+     fertilizer + NASS corn prices exactly, and each NASS link must be listed
+     in Sources. The saved corn prices need a real value and an https link.
 
 Anything wrong is printed as a plain-English problem and the check fails
 (exit code 1), which stops the weekly build so a bad number never goes out.
@@ -22,7 +25,7 @@ import sys
 from datetime import date
 from pathlib import Path
 
-from . import brief, changes
+from . import brief, changes, corn_price
 from .paths import BRIEFS_DIR
 
 
@@ -144,18 +147,58 @@ def check_brief(markdown: str, results: list[dict]) -> list[str]:
     return problems
 
 
+def check_corn_data(prices) -> list[str]:
+    """Problems in the saved NASS corn prices (data/corn_price.csv)."""
+    problems = []
+    for p in prices:
+        label = f"corn price {p.state} {p.year}-{p.month:02d}"
+        if not p.value > 0:
+            problems.append(f"Data: {label} is not above zero.")
+        if not p.source_url.startswith("https://"):
+            problems.append(f"Data: {label} source link is missing or not https.")
+        if not p.source_name.strip():
+            problems.append(f"Data: {label} has no source name.")
+    return problems
+
+
+def section_lines(markdown: str, title: str) -> list[str]:
+    """The '- ' bullet lines under a '## title' heading (up to the next heading)."""
+    if f"## {title}" not in markdown:
+        return []
+    part = markdown.split(f"## {title}", 1)[1].split("\n## ", 1)[0]
+    return [line[2:] for line in part.splitlines() if line.startswith("- ")]
+
+
+def check_afford(markdown: str, results: list[dict], corn_prices) -> list[str]:
+    """The bushels-per-ton lines must match the data exactly, nothing extra or missing."""
+    b = brief.build(results, date.today(), corn_prices)
+    found, wanted = section_lines(markdown, brief.AFFORD_TITLE), b["afford"]
+    problems = [f"Brief: bushels line not in the saved data: '{line}'"
+                for line in found if line not in wanted]
+    problems += [f"Brief: bushels line in the data but missing from the brief: '{line}'"
+                 for line in wanted if line not in found]
+    sources_part = markdown.split("## Sources", 1)[1] if "## Sources" in markdown else ""
+    for s in b["afford_sources"]:
+        if s["url"] not in sources_part:
+            problems.append(f"Brief: NASS source {s['url']} is not listed in the Sources section.")
+    return problems
+
+
 def newest_brief(out_dir=None):
     files = sorted(Path(out_dir or BRIEFS_DIR).glob("*.md"))
     return files[-1] if files else None
 
 
-def run_checks(brief_path=None, data_path=None, today=None) -> list[str]:
-    problems = check_data(data_path, today)
+def run_checks(brief_path=None, data_path=None, today=None, corn_path=None) -> list[str]:
+    corn_prices = corn_price.load_prices(corn_path)
+    problems = check_data(data_path, today) + check_corn_data(corn_prices)
     path = Path(brief_path) if brief_path else newest_brief()
     if path is None or not path.exists():
         return problems + ["No brief found to check."]
     rows = changes.read_rows(data_path)
-    return problems + check_brief(path.read_text(encoding="utf-8"), changes.compute(rows))
+    results = changes.compute(rows)
+    text = path.read_text(encoding="utf-8")
+    return problems + check_brief(text, results) + check_afford(text, results, corn_prices)
 
 
 def main(argv=None) -> int:
