@@ -2,6 +2,13 @@
 
 Newest first.
 
+## 2026-11-11 — Market-scan step: 12-week price trend
+**Built:** `src/costwire/trend.py` draws a small inline SVG line per fertilizer (anhydrous, urea, UAN, DAP, MAP, potash; each state) from every saved price in `data/fertilizer.csv` over the last 12 weeks. No new data source. Same item, state, unit and USDA AMS report only; needs 2+ saved dates, otherwise it is left out. Each chart has one plain sentence under it (first, newest, low, high, each with its date). That sentence is also in the Markdown brief, and the accuracy check now re-checks every trend line against the data. 10 new tests (182 total, all pass). Checked at phone width (375px): no sideways scroll.
+**Try it:** `PYTHONPATH=src python -m pytest -q tests/test_trend.py`; `python -m costwire.brief` then open the HTML.
+**Andy:** nothing. The section is hidden until the weekly job has saved 2+ report dates (right now each fertilizer has only Oct 30, 2026), so it should first show up after the next new USDA report is pulled.
+Marketing: referral offer (forward-to-a-neighbor) (marketing/referral-offer.md) - Andy: reply SEND/POST in chat to have it sent
+**Next:** every PLAN step is checked off. Marketing asset 10 ($0-$20 ad test plan).
+
 ## 2026-11-11 — QA (the-cost-wire)
 **Checked:** 170 tests pass (needs `pip install -r requirements.txt cffi`); built changes → brief → accuracy check → site in a scratch copy (passes); all 4 site pages at 375px: no sideways scroll, disclaimer on each, no broken local links, no page errors. Tried the new bushels-of-corn line with sample NASS rows: renders and passes the accuracy check. (Iowa shows only anhydrous because the Iowa AMS report has no urea or UAN 28% row. The parser is correct.)
 **Fixed:** a 0 in `data/corn_price.csv` crashed the whole brief (divide by zero), and a "nan" printed "nan bushels of corn per ton" in the brief. Now `affordability.py` skips any corn price that isn't a real number above zero (uses an older good month if there is one, otherwise leaves the line out). The accuracy check still flags the bad row. 2 new tests (172 total, all pass).

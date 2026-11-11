@@ -24,7 +24,7 @@ import sys
 from datetime import date, datetime
 from zoneinfo import ZoneInfo
 
-from . import affordability, changes, corn_price
+from . import affordability, changes, corn_price, trend
 from .paths import BRIEFS_DIR
 
 ITEM_NAMES = {
@@ -242,10 +242,30 @@ def afford_sources(afford: list[dict]) -> list[dict]:
     return out
 
 
-def build(results: list[dict], brief_date: date, corn_prices=None) -> dict:
-    """Everything the templates need, in one dict."""
+TREND_TITLE = "12-week price trend"
+TREND_NOTE = ("Every saved price for each fertilizer over the last 12 weeks, from the same "
+              "USDA AMS report as the table above. Shown only when at least 2 dates are saved.")
+
+
+def trend_line(t: dict) -> str:
+    """One plain sentence per trend: first, newest, low and high, each with its date."""
+    u = per_unit(t["unit"])
+    (d0, p0), (d1, p1) = t["points"][0], t["points"][-1]
+    (dl, pl), (dh, ph) = t["low"], t["high"]
+    return (f"{region_name(t['region'])} {item_in_sentence(t['item'])}: "
+            f"{len(t['points'])} saved prices from {short_date(d0)} ({money(p0)}{u}) "
+            f"to {short_date(d1)} ({money(p1)}{u}); "
+            f"low {money(pl)}{u} ({short_date(dl)}), high {money(ph)}{u} ({short_date(dh)}).")
+
+
+def build(results: list[dict], brief_date: date, corn_prices=None, history=None) -> dict:
+    """Everything the templates need, in one dict.
+
+    history = all saved price rows (for the 12-week trend); without it, no trend.
+    """
     rows = sorted(results, key=sort_key)
     afford = affordability.compute(results, corn_prices or [])
+    trends = trend.compute(rows, history or [])
     return {
         "date": brief_date,
         "headline": headline(rows),
@@ -253,6 +273,9 @@ def build(results: list[dict], brief_date: date, corn_prices=None) -> dict:
         "lines": [what_changed(r) for r in rows],
         "afford": [afford_line(a) for a in afford],
         "afford_sources": afford_sources(afford),
+        "trends": [{"line": trend_line(t),
+                    "svg": trend.svg(t["points"], f"{TREND_TITLE}: {trend_line(t)}")}
+                   for t in trends],
         "sources": sources(rows),
         "credit": credit_line(sources(rows), nass=bool(afford)),
     }
@@ -278,6 +301,9 @@ def to_markdown(b: dict) -> str:
     if b.get("afford"):
         out += ["", f"## {AFFORD_TITLE}", "", AFFORD_NOTE, ""]
         out += [f"- {line}" for line in b["afford"]]
+    if b.get("trends"):
+        out += ["", f"## {TREND_TITLE}", "", TREND_NOTE, ""]
+        out += [f"- {t['line']}" for t in b["trends"]]
     out += ["", "## Sources", ""]
     out += [f"- [{s['name']}]({s['url']}) — data as of {short_date(s['as_of'])}"
             for s in b["sources"]]
@@ -309,6 +335,11 @@ def to_html(b: dict) -> str:
         items = "\n".join(f"<li>{e(line)}</li>" for line in b["afford"])
         afford = (f"<h2>{e(AFFORD_TITLE)}</h2>\n<p class=\"note\">{e(AFFORD_NOTE)}</p>\n"
                   f"<ul>\n{items}\n</ul>\n")
+    trends = ""
+    if b.get("trends"):
+        items = "\n".join(f"<li>{t['svg']}<br>{e(t['line'])}</li>" for t in b["trends"])
+        trends = (f"<h2>{e(TREND_TITLE)}</h2>\n<p class=\"note\">{e(TREND_NOTE)}</p>\n"
+                  f"<ul class=\"trends\">\n{items}\n</ul>\n")
     return f"""<!doctype html>
 <html lang="en">
 <head>
@@ -321,6 +352,9 @@ table {{ border-collapse: collapse; width: 100%; font-size: 0.95rem; }}
 th, td {{ border-bottom: 1px solid #ddd; padding: 0.4rem; text-align: left; }}
 td.num {{ text-align: right; white-space: nowrap; }}
 .table-wrap {{ overflow-x: auto; }}
+svg.trend {{ display: block; max-width: 100%; height: auto; }}
+ul.trends {{ list-style: none; padding-left: 0; }}
+ul.trends li {{ margin-bottom: 0.8rem; }}
 .note, .disclaimer {{ color: #555; font-size: 0.9rem; }}
 </style>
 </head>
@@ -340,7 +374,7 @@ td.num {{ text-align: right; white-space: nowrap; }}
 <ul>
 {lines}
 </ul>
-{afford}<h2>Sources</h2>
+{afford}{trends}<h2>Sources</h2>
 <ul>
 {srcs}
 </ul>
@@ -362,7 +396,7 @@ def write_brief(brief_date: date, in_path=None, out_dir=None, corn_path=None):
     rows = changes.read_rows(in_path)
     if not rows:
         return None
-    b = build(changes.compute(rows), brief_date, corn_price.load_prices(corn_path))
+    b = build(changes.compute(rows), brief_date, corn_price.load_prices(corn_path), rows)
     out_dir = out_dir or BRIEFS_DIR
     out_dir.mkdir(parents=True, exist_ok=True)
     md_path = out_dir / f"{brief_date.isoformat()}.md"
