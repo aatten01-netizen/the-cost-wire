@@ -15,6 +15,7 @@ Product rule: never guess a number. If either price is missing, the line (or
 the year-ago part) is left out. Nothing here says whether to buy or sell.
 """
 
+import math
 from datetime import date
 
 ITEMS = ["anhydrous", "urea", "uan28"]
@@ -26,10 +27,17 @@ def months_between(later: date, earlier: date) -> int:
     return (later.year - earlier.year) * 12 + (later.month - earlier.month)
 
 
+def usable(corn) -> bool:
+    """A real corn price: a finite number above zero. A 0, blank or "nan" row in the
+    saved CSV would crash the division or print "nan bushels", so it's left out
+    (the accuracy check still flags the bad row)."""
+    return isinstance(corn.value, (int, float)) and math.isfinite(corn.value) and corn.value > 0
+
+
 def pick_corn(prices, state: str, as_of: date):
     """The corn price to pair with a fertilizer price dated `as_of`, or None."""
     ok = [p for p in prices
-          if p.state == state and p.month_start <= as_of
+          if usable(p) and p.state == state and p.month_start <= as_of
           and months_between(as_of, p.month_start) <= MAX_MONTH_GAP]
     return max(ok, key=lambda p: p.month_start) if ok else None
 
@@ -37,7 +45,7 @@ def pick_corn(prices, state: str, as_of: date):
 def year_before(prices, corn):
     """The same state's corn price for the same month one year earlier, or None."""
     for p in prices:
-        if p.state == corn.state and p.year == corn.year - 1 and p.month == corn.month:
+        if usable(p) and p.state == corn.state and p.year == corn.year - 1 and p.month == corn.month:
             return p
     return None
 

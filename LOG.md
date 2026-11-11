@@ -2,6 +2,11 @@
 
 Newest first.
 
+## 2026-11-11 — QA (the-cost-wire)
+**Checked:** 170 tests pass (needs `pip install -r requirements.txt cffi`); built changes → brief → accuracy check → site in a scratch copy (passes); all 4 site pages at 375px: no sideways scroll, disclaimer on each, no broken local links, no page errors. Tried the new bushels-of-corn line with sample NASS rows: renders and passes the accuracy check. (Iowa shows only anhydrous because the Iowa AMS report has no urea or UAN 28% row. The parser is correct.)
+**Fixed:** a 0 in `data/corn_price.csv` crashed the whole brief (divide by zero), and a "nan" printed "nan bushels of corn per ton" in the brief. Now `affordability.py` skips any corn price that isn't a real number above zero (uses an older good month if there is one, otherwise leaves the line out). The accuracy check still flags the bad row. 2 new tests (172 total, all pass).
+**Verify:** `PYTHONPATH=src python3 -m pytest -q tests/test_affordability.py`.
+
 ## 2026-11-11 — Market-scan step: bushels of corn to buy 1 ton (night shift)
 **Built:** the affordability line. `src/costwire/corn_price.py` pulls the USDA NASS monthly corn price received for Iowa and Illinois (Quick Stats, key from `NASS_API_KEY`, skips cleanly without it) into `data/corn_price.csv`. `src/costwire/affordability.py` divides the AMS anhydrous, urea and UAN 28% price by that state's newest NASS corn month (no later than the fertilizer date, at most 3 months older), and does the same for 1 year ago (year-ago AMS price ÷ same month a year earlier). The brief gets a "Bushels of corn to buy 1 ton" section, NASS links in Sources and NASS in the credit line. Missing either number = the line (or the year-ago part) is left out. The accuracy check now also re-checks every bushels line and the NASS links. The weekly job runs the corn pull after cash rents; a failure never stops the brief. 13 new tests (170 total, all pass).
 **Try it:** `PYTHONPATH=src python -m pytest -q`; with a key: `NASS_API_KEY=... PYTHONPATH=src python -m costwire.corn_price` then `python -m costwire.brief`.

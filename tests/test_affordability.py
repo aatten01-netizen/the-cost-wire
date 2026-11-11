@@ -167,6 +167,39 @@ def test_write_brief_uses_saved_corn_file(tmp_path):
     assert accuracy.run_checks(md_path, data, date(2026, 11, 9), corn) == []
 
 
+def test_bad_corn_values_are_skipped_not_divided():
+    # QA 2026-11-11: a 0 used to crash the whole brief (ZeroDivisionError) and a
+    # "nan" printed "nan bushels". Bad months are skipped; an older good month is used.
+    bad = CORN + [CornPrice("IA", 2026, 10, 0.0, NASS_IA),
+                  CornPrice("IA", 2026, 11, float("nan"), NASS_IA),
+                  CornPrice("IA", 2025, 10, float("inf"), NASS_IA)]
+    assert affordability.pick_corn(bad, "IA", date(2026, 11, 20)).month == 9
+    only_bad = [CornPrice("IA", 2026, 10, 0.0, NASS_IA), CornPrice("IA", 2026, 9, -1.0, NASS_IA)]
+    assert affordability.pick_corn(only_bad, "IA", date(2026, 10, 30)) is None
+    # year-ago month with a bad value: the year-ago part is left out, not guessed
+    rows = [fert("anhydrous", "IA", 902.33, date(2026, 10, 2)),
+            fert("anhydrous", "IA", 760.00, date(2025, 10, 3))]
+    yr_bad = [CornPrice("IA", 2026, 9, 4.17, NASS_IA), CornPrice("IA", 2025, 9, 0.0, NASS_IA)]
+    [a] = affordability.compute(changes.compute(rows), yr_bad)
+    assert a["bushels"] == 216.4 and a["bushels_1y"] is None and a["change_1y"] is None
+
+
+def test_write_brief_survives_zero_and_nan_in_saved_corn_file(tmp_path):
+    data = tmp_path / "fert.csv"
+    data.write_text("item,price,unit,as_of,source_name,source_url,region\n"
+                    f"urea,770.0,$/ton,2026-10-02,USDA AMS Iowa Production Cost Report,{AMS},IA\n"
+                    f"urea,770.0,$/ton,2026-10-02,USDA AMS Illinois Production Cost Report,{AMS},IL\n")
+    corn = tmp_path / "corn.csv"
+    corn.write_text("state,year,month,value,unit,source_url,source_name\n"
+                    f"IA,2026,9,0,$/bu,{NASS_IA},USDA NASS\n"
+                    f"IL,2026,9,nan,$/bu,{NASS_IL},USDA NASS\n")
+    md_path, _ = brief.write_brief(date(2026, 11, 9), data, tmp_path / "b", corn)
+    md = md_path.read_text()
+    assert "nan" not in md.lower() and brief.AFFORD_TITLE not in md
+    problems = accuracy.run_checks(md_path, data, date(2026, 11, 9), corn)
+    assert sum("not above zero" in p for p in problems) == 2   # bad rows still flagged
+
+
 def test_weekly_runs_corn_step_and_survives_its_failure():
     calls = []
     def step(name, code=0):
