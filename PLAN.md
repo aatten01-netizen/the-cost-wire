@@ -23,3 +23,6 @@ One step per weekly build session. Do the first unchecked step, then check it of
 ## From market scan
 - [x] (Nov 11 scan) Affordability line: "bushels of corn to buy 1 ton" of anhydrous, urea and UAN28 for IA and IL = AMS fertilizer price ÷ NASS Quick Stats monthly corn price received (state, cited, dated), vs 1 year ago; leave it out if either number is missing — why: NCGA's record "185 bushels per ton of urea" is widely cited, https://www.agweb.com/news/fertilizer-prices-top-list-2026-profitability-threats-global-supply-tightens (search result only; page not opened this run, verify)
 - [x] (Nov 11 scan) 12-week price trend: small inline SVG line per fertilizer on the brief page, built only from data/fertilizer.csv (no new data source) — why: farmers compare quotes to mid-September ("~$150 per ton higher"), https://www.fertilizerdaily.com/20261028-u-s-corn-growers-urge-faster-fertilizer-antitrust-action-as-prices-keep-rising/md/ (search result only; page not opened this run, verify)
+
+## Added by build bot (all steps above done)
+- [x] 15. RSS feed: `site/feed.xml`, one item per brief (title + headline copied from the brief, link, date), linked from every page's nav and `<head>`. No new data. Tests.

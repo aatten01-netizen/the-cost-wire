@@ -2,6 +2,13 @@
 
 Newest first.
 
+## 2026-11-12 — Step 15: RSS feed
+**Built:** every PLAN step was already checked off, so I added step 15 and did it. `src/costwire/feed_rss.py` writes `site/feed.xml` (RSS 2.0) each time the site builds: one item per weekly brief, newest first (max 20), with the brief's own title and headline, its link and date. No new numbers: every word is copied from the brief, which already passed the accuracy check. Every page now has an "RSS" link in the nav and a feed tag in its `<head>` so feed readers find it. Site address comes from optional env var `SITE_URL` (default: the live GitHub Pages address; added to `.env.example`). 5 new tests (187 total, all pass). Site rebuilt; accuracy check passes; all 4 pages checked at 375px, no sideways scroll.
+**Try it:** `PYTHONPATH=src python3 -m pytest -q tests/test_feed_rss.py`; `python -m costwire.site` then open `site/feed.xml`. Live after the next Monday job: https://aatten01-netizen.github.io/the-cost-wire/feed.xml
+**Andy:** nothing needed. Optional: paste the feed link into a free reader (Feedly, Outlook) to see it.
+Marketing: launch checklist (marketing/launch-checklist.md) - Andy: reply SEND/POST in chat to have it sent
+**Next:** every PLAN step and all 11 marketing assets are done. Next build needs a new market scan or a new PLAN step from Andy. Still open for Andy (from earlier logs): `NASS_API_KEY` secret, Resend test email, signup form go-live.
+
 ## 2026-11-12 — Marketing session (night shift, Cost Wire, asset 10)
 **Build step:** none. Every PLAN step, including both "From market scan" items, is checked off. Tests: 182 pass (`pip install -r requirements.txt cffi pytest`, then `PYTHONPATH=src python3 -m pytest -q`).
 **Made:** asset 10, `marketing/ad-test-plan.md`: a $0 free-channel baseline week, then a $20 Facebook/Instagram boost test (2 ads × $10, IA/IL/MN/WI farmers, no school/college/FFA targeting), honest measuring (static site has no analytics, so signups are counted in the Sheet), stop rules and win thresholds set ahead of time. Ad images use only real screenshots of the live brief. Meta's minimum daily budget not verified this run.

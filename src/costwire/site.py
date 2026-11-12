@@ -4,6 +4,7 @@ Pages it writes:
   site/index.html              the latest brief, with a nav bar and signup box
   site/archive.html            list of every brief, newest first
   site/briefs/<date>.html      each brief (same content as briefs/<date>.html)
+  site/feed.xml                RSS feed of the briefs (see feed_rss.py)
   site/.nojekyll               tells GitHub Pages to serve files as they are
 
 The signup box is a placeholder (collects nothing) UNLESS both env vars are set
@@ -21,7 +22,7 @@ import shutil
 import sys
 from datetime import date
 
-from . import nass_land, rentpage
+from . import feed_rss, nass_land, rentpage
 from .paths import BRIEFS_DIR, SITE_DIR
 
 BRIEF_NAME = re.compile(r"^(\d{4}-\d{2}-\d{2})\.html$")
@@ -86,12 +87,20 @@ def nav(prefix: str) -> str:
     return (f'<nav class="sitenav"><a class="brand" href="{prefix}index.html">The Cost Wire</a>'
             f'<a href="{prefix}index.html">Latest</a>'
             f'<a href="{prefix}cash-rent.html">Cash rent</a>'
-            f'<a href="{prefix}archive.html">Archive</a></nav>')
+            f'<a href="{prefix}archive.html">Archive</a>'
+            f'<a href="{prefix}feed.xml">RSS</a></nav>')
+
+
+def feed_link(prefix: str) -> str:
+    """<head> tag so feed readers can find the RSS feed from any page."""
+    return (f'<link rel="alternate" type="application/rss+xml" '
+            f'title="The Cost Wire" href="{prefix}feed.xml">')
 
 
 def wrap_brief(brief_html: str, prefix: str, with_signup: bool) -> str:
     """Add the nav (and optionally the signup box) to a finished brief page."""
     page = brief_html.replace("</style>", SITE_CSS + "</style>", 1)
+    page = page.replace("</head>", feed_link(prefix) + "\n</head>", 1)
     page = page.replace("<body>", "<body>\n" + nav(prefix), 1)
     if with_signup:
         page = page.replace("</body>", signup_box() + "\n</body>", 1)
@@ -112,6 +121,7 @@ def archive_page(dates: list[date]) -> str:
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>The Cost Wire — archive</title>
+{feed_link('')}
 <style>
 body {{ font-family: Georgia, serif; max-width: 860px; margin: 2rem auto; padding: 0 1rem; color: #222; }}
 {SITE_CSS}
@@ -165,6 +175,9 @@ def build_site(briefs_dir=None, site_dir=None, land_file=None) -> list:
     (site_dir / "cash-rent.html").write_text(
         rent_page(nass_land.load_records(land_file)), encoding="utf-8")
     (site_dir / "archive.html").write_text(archive_page([d for d, _ in files]), encoding="utf-8")
+    pages = [(d, path.read_text(encoding="utf-8")) for d, path in files]
+    (site_dir / "feed.xml").write_text(
+        feed_rss.build_feed(pages, feed_rss.site_url()), encoding="utf-8")
     return [d for d, _ in files]
 
 

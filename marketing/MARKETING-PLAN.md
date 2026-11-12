@@ -30,4 +30,4 @@ Free weekly brief (web + email). Later paid tier (~$9-15/month per BRIEF.md): yo
 - [x] 8. Cross-promo offer for Commodity Wire list (marketing/cross-promo-commodity-wire.md)
 - [x] 9. Referral offer (forward-to-a-neighbor) (marketing/referral-offer.md)
 - [x] 10. $0-$20 ad test plan (marketing/ad-test-plan.md)
-- [ ] 11. Launch checklist (after docs/launch-checklist.md is done)
+- [x] 11. Launch checklist (marketing/launch-checklist.md)
