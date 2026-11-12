@@ -2,6 +2,13 @@
 
 Newest first.
 
+## 2026-11-12 — Marketing session (night shift, Cost Wire, asset 10)
+**Build step:** none. Every PLAN step, including both "From market scan" items, is checked off. Tests: 182 pass (`pip install -r requirements.txt cffi pytest`, then `PYTHONPATH=src python3 -m pytest -q`).
+**Made:** asset 10, `marketing/ad-test-plan.md`: a $0 free-channel baseline week, then a $20 Facebook/Instagram boost test (2 ads × $10, IA/IL/MN/WI farmers, no school/college/FFA targeting), honest measuring (static site has no analytics, so signups are counted in the Sheet), stop rules and win thresholds set ahead of time. Ad images use only real screenshots of the live brief. Meta's minimum daily budget not verified this run.
+Marketing: $0-$20 ad test plan - Andy: reply SEND/POST in chat to have it sent
+**Andy:** don't spend until the signup form is live; you make the Facebook Page and do the boost yourself.
+**Next:** marketing asset 11 (launch checklist marketing piece). New build work needs a new market scan or PLAN step.
+
 ## 2026-11-11 — Market-scan step: 12-week price trend
 **Built:** `src/costwire/trend.py` draws a small inline SVG line per fertilizer (anhydrous, urea, UAN, DAP, MAP, potash; each state) from every saved price in `data/fertilizer.csv` over the last 12 weeks. No new data source. Same item, state, unit and USDA AMS report only; needs 2+ saved dates, otherwise it is left out. Each chart has one plain sentence under it (first, newest, low, high, each with its date). That sentence is also in the Markdown brief, and the accuracy check now re-checks every trend line against the data. 10 new tests (182 total, all pass). Checked at phone width (375px): no sideways scroll.
 **Try it:** `PYTHONPATH=src python -m pytest -q tests/test_trend.py`; `python -m costwire.brief` then open the HTML.
