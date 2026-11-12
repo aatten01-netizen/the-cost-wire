@@ -84,3 +84,68 @@ def test_run_checks_end_to_end_and_main_exit_code(tmp_path, capsys):
     assert accuracy.run_checks(b, data, TODAY)
     assert accuracy.main(["--brief", str(tmp_path / "missing.md")]) == 1
     assert "FAILED" in capsys.readouterr().err
+
+
+# --- QA 2026-11-12: guard paths that had no test yet ---
+
+URL = "https://www.ams.usda.gov/mnreports/ams_3195.pdf"
+
+
+def urea_row(md):
+    return next(l for l in md.splitlines() if l.startswith("| Urea"))
+
+
+def test_duplicated_row_is_caught(tmp_path):
+    md, results = make_brief(write(tmp_path, GOOD))
+    row = urea_row(md)
+    problems = accuracy.check_brief(md.replace(row, row + "\n" + row), results)
+    assert any("appears more than once" in p for p in problems)
+
+
+def test_row_with_missing_column_is_caught(tmp_path):
+    md, results = make_brief(write(tmp_path, GOOD))
+    row = urea_row(md)
+    short = row.replace(" n/a | n/a |", " n/a |", 1)   # drop the 1-year column
+    problems = accuracy.check_brief(md.replace(row, short), results)
+    assert any("does not have all 7 columns" in p for p in problems)
+
+
+def test_table_source_link_must_be_https(tmp_path):
+    # If the brief's link is downgraded to http, the row no longer matches the
+    # data AND it is flagged as having no https link.
+    md, results = make_brief(write(tmp_path, GOOD))
+    row = urea_row(md)
+    problems = accuracy.check_brief(md.replace(row, row.replace("https://", "http://")), results)
+    assert any("no https source link" in p for p in problems)
+    assert any("source says" in p for p in problems)
+
+
+def test_source_dropped_from_sources_section_is_caught(tmp_path):
+    md, results = make_brief(write(tmp_path, GOOD))
+    head, sources = md.split("## Sources", 1)
+    md2 = head + "## Sources" + sources.replace(URL, "https://example.gov/other.pdf")
+    problems = accuracy.check_brief(md2, results)
+    assert any(f"source {URL} is not listed" in p for p in problems)
+
+
+def test_disclaimer_removed_but_sources_kept_is_caught(tmp_path):
+    md, results = make_brief(write(tmp_path, GOOD))
+    assert brief.DISCLAIMER in md
+    problems = accuracy.check_brief(md.replace(brief.DISCLAIMER, ""), results)
+    assert problems == ["Brief: the disclaimer is missing."]
+
+
+def test_whole_trend_section_deleted_is_caught():
+    from datetime import timedelta
+    src = "USDA AMS Iowa Production Cost Report"
+    url = "https://www.ams.usda.gov/mnreports/ams_2863.pdf"
+    last = date(2026, 10, 30)
+    rows = [{"item": "urea", "price": p, "unit": "$/ton", "as_of": last - timedelta(weeks=2 - i),
+             "source_name": src, "source_url": url, "region": "IA"}
+            for i, p in enumerate([600.0, 610.0, 620.0])]
+    results = changes.compute(rows)
+    md = brief.to_markdown(brief.build(results, date(2026, 11, 2), None, rows))
+    assert f"## {brief.TREND_TITLE}" in md
+    no_trend = md.split(f"## {brief.TREND_TITLE}")[0] + "## Sources" + md.split("## Sources", 1)[1]
+    problems = accuracy.check_trend(no_trend, results, rows)
+    assert problems and all("missing from the brief" in p for p in problems)

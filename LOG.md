@@ -2,6 +2,11 @@
 
 Newest first.
 
+## 2026-11-12 — QA (the-cost-wire)
+**Checked:** 187 tests pass (needs `pip install -r requirements.txt cffi pytest`; without pdfplumber installed 7 Iowa PDF tests fail, which is a setup issue, not a bug). In a scratch copy ran changes → brief → accuracy check → site → launch check: all pass, `site/feed.xml` is valid XML (7 of 10 launch items ready; the 3 open ones are Andy's: NASS key, test email key, signup go-live). All 5 pages at 375px: no sideways scroll, disclaimer on each, no broken local links, no page errors.
+**Fixed:** nothing was broken, so I added tests for the accuracy check (the guard that stops a bad number reaching farmers). 6 new tests cover paths that had none: a duplicated table row, a row missing a column, a source link downgraded to http, a source dropped from the Sources list, the disclaimer deleted, and the whole 12-week trend section deleted. All are caught. 193 tests, all pass.
+**Verify:** `PYTHONPATH=src python3 -m pytest -q tests/test_accuracy.py`.
+
 ## 2026-11-12 — Step 15: RSS feed
 **Built:** every PLAN step was already checked off, so I added step 15 and did it. `src/costwire/feed_rss.py` writes `site/feed.xml` (RSS 2.0) each time the site builds: one item per weekly brief, newest first (max 20), with the brief's own title and headline, its link and date. No new numbers: every word is copied from the brief, which already passed the accuracy check. Every page now has an "RSS" link in the nav and a feed tag in its `<head>` so feed readers find it. Site address comes from optional env var `SITE_URL` (default: the live GitHub Pages address; added to `.env.example`). 5 new tests (187 total, all pass). Site rebuilt; accuracy check passes; all 4 pages checked at 375px, no sideways scroll.
 **Try it:** `PYTHONPATH=src python3 -m pytest -q tests/test_feed_rss.py`; `python -m costwire.site` then open `site/feed.xml`. Live after the next Monday job: https://aatten01-netizen.github.io/the-cost-wire/feed.xml
