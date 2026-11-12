@@ -2,6 +2,14 @@
 
 Newest first.
 
+## 2026-11-12 — Step 16: Pricing page (Free vs Pro, mock checkout)
+**Why this step:** every PLAN step was done, and the new money-goal rule says pick what makes the product sellable sooner. A pricing page with checkout behind a mock is the first piece of a paid tier.
+**Built:** `src/costwire/pricing.py` writes `site/pricing.html` on every site build: Free ($0, what's live today) vs Pro (coming soon, $9/month or $90/year per BRIEF.md's $9-15 range), plus a short Q&A and the data-not-advice line. "Pricing" is in every page's nav. The Pro button is disabled ("Pro is not open yet") unless `PRO_CHECKOUT_URL` is a Stripe Payment Link (https://buy.stripe.com/...) AND `PRO_CHECKOUT_LIVE=yes`; anything else stays a mock. The free signup box now has `id="signup"` so the pricing page can link to it. Launch check has a new "Pricing page built" line (8 of 11 ready). Added `REVENUE.md`. 8 new tests (201 total, all pass). Pricing and home pages checked at 375px: no sideways scroll.
+**Try it:** `PYTHONPATH=src python3 -m pytest -q tests/test_pricing.py`; `PYTHONPATH=src python3 -m costwire.site`, open `site/pricing.html`. Live after the next deploy: https://aatten01-netizen.github.io/the-cost-wire/pricing.html
+**Andy:** nothing required now. Later: (1) turn on the signup form (docs/signup-google-sheet.md) — biggest blocker to a first dollar; (2) change the Pro price in `src/costwire/pricing.py` if you want something other than $9; (3) only once alerts exist, make a Stripe Payment Link (https://dashboard.stripe.com/payment-links) and add `PRO_CHECKOUT_URL` + `PRO_CHECKOUT_LIVE=yes` as repo variables. Don't sell Pro before its features work.
+Marketing: Pro "would you pay?" reader survey (marketing/pro-interest-survey.md) - Andy: reply SEND/POST in chat to have it sent
+**Next:** Step 17, price-move alerts (core Pro feature) behind a mock sender.
+
 ## 2026-11-12 — QA (the-cost-wire)
 **Checked:** 187 tests pass (needs `pip install -r requirements.txt cffi pytest`; without pdfplumber installed 7 Iowa PDF tests fail, which is a setup issue, not a bug). In a scratch copy ran changes → brief → accuracy check → site → launch check: all pass, `site/feed.xml` is valid XML (7 of 10 launch items ready; the 3 open ones are Andy's: NASS key, test email key, signup go-live). All 5 pages at 375px: no sideways scroll, disclaimer on each, no broken local links, no page errors.
 **Fixed:** nothing was broken, so I added tests for the accuracy check (the guard that stops a bad number reaching farmers). 6 new tests cover paths that had none: a duplicated table row, a row missing a column, a source link downgraded to http, a source dropped from the Sources list, the disclaimer deleted, and the whole 12-week trend section deleted. All are caught. 193 tests, all pass.

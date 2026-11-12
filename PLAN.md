@@ -26,3 +26,5 @@ One step per weekly build session. Do the first unchecked step, then check it of
 
 ## Added by build bot (all steps above done)
 - [x] 15. RSS feed: `site/feed.xml`, one item per brief (title + headline copied from the brief, link, date), linked from every page's nav and `<head>`. No new data. Tests.
+- [x] 16. Pricing page: `site/pricing.html` with Free vs Pro ($9/mo or $90/yr, planned), linked from every page's nav. Pro checkout is a mock (disabled) unless `PRO_CHECKOUT_URL` (Stripe Payment Link) + `PRO_CHECKOUT_LIVE=yes`. Tests.
+- [ ] 17. Price-move alerts (the core Pro feature): readers pick an item, state and dollar threshold; after each weekly pull, find who should be alerted from published prices only; send through a mock sender (no real emails). Tests.

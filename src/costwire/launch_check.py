@@ -66,6 +66,8 @@ def run_checks(data_dir=None, briefs_dir=None, site_dir=None, env=None) -> list[
     add("Website built (home, archive, cash rent)",
         all((site_dir / p).exists() for p in ("index.html", "archive.html", "cash-rent.html")),
         "Run python -m costwire.site")
+    add("Pricing page built (Free vs Pro)", (site_dir / "pricing.html").exists(),
+        "Run python -m costwire.site")
     add("Test email key set (RESEND_API_KEY + BRIEF_TEST_EMAIL)",
         env.get("RESEND_API_KEY") and env.get("BRIEF_TEST_EMAIL"),
         "Only needed on the computer you send the test from")

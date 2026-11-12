@@ -31,3 +31,4 @@ Free weekly brief (web + email). Later paid tier (~$9-15/month per BRIEF.md): yo
 - [x] 9. Referral offer (forward-to-a-neighbor) (marketing/referral-offer.md)
 - [x] 10. $0-$20 ad test plan (marketing/ad-test-plan.md)
 - [x] 11. Launch checklist (marketing/launch-checklist.md)
+- [x] 12. Pro "would you pay?" check: 5-question reply survey for free readers (marketing/pro-interest-survey.md)
