@@ -31,3 +31,10 @@ Every build bot is also its business's marketer. Each run: do your normal build 
 2. Build the next unmade asset completely, ready to use: landing page copy, 5 ready-to-send outreach messages to real public prospects (public pages/emails/contact forms only), value-first community posts with each group's self-promo rules, short-video scripts, an SEO article, a partnership or referral offer, a $0-$20 ad test plan, or a launch checklist.
 3. Save it in marketing/, check it off, and add one line to LOG.md: "Marketing: <asset> - Andy: reply SEND/POST in chat to have it sent".
 Rules: never send, post, DM, comment, sign up or spend on your own - Andy approves in chat. No fake testimonials, user counts or income claims. Keep the product's own rules (data not advice, education only, etc.). Skip only if a separate marketing bot already covers this exact business (Commodity Wire has one).
+
+## MONEY GOAL: $100K/MONTH ACROSS ALL BUSINESSES (Andy, Nov 12, 2026)
+Andy's target is $100,000/month in revenue combined across ALL his businesses by the end of 2027 (insurance agency not counted). This product is part of it. Building features is not the goal; paying customers are. Every bot, every run:
+1. Keep REVENUE.md at the repo root (create it the first time, update every run): price and tiers, who pays, a realistic path to this product's share of $100K/month (customers x price, clearly labeled as an estimate, never a promise), what is still missing before the first dollar, and the single fastest next step to it.
+2. If the first unchecked PLAN.md step is a nice-to-have and a later step makes the product sellable sooner (pricing page, checkout behind a mock, onboarding, the one core paid feature, deploy-readiness), do the sellable one and note why in LOG.md.
+3. Add one line to your final summary: "$: <product> - <closest step to first dollar>".
+No fake revenue, customer counts or income claims; never sign up, sell, publish or spend. All rules above still apply.
