@@ -18,9 +18,9 @@ Midwest corn/soy and livestock farmers who buy fertilizer, fuel and feed and ren
 ## Still missing before the first dollar
 1. Signup form live (Andy: docs/signup-google-sheet.md), so there is a free list to sell to. **Biggest blocker.**
 2. 5 readers say they'd pay (marketing/pro-interest-survey.md).
-3. The one core paid feature: price-move email alerts (not built).
+3. Alert sign-up on the site (Step 18) and a real sender (Step 19). The alert logic itself is built (Step 17, mock sender).
 4. Stripe Payment Link made by Andy and set as `PRO_CHECKOUT_URL` + `PRO_CHECKOUT_LIVE=yes` (only after alerts exist).
-- Done: pricing page with mock checkout (`site/pricing.html`, Nov 12, 2026).
+- Done: pricing page with mock checkout (`site/pricing.html`, Nov 12, 2026); price-move alert logic with mock sender (`src/costwire/alerts.py`, Nov 12, 2026).
 
 ## Fastest next step to the first dollar
-Andy turns on the signup form (SIGNUP_FORM_URL + SIGNUP_LIVE=yes), then sends the Pro survey to the first readers. Next bot build: price-move alert logic (who gets alerted, behind a mock sender).
+Andy turns on the signup form (SIGNUP_FORM_URL + SIGNUP_LIVE=yes), then sends the Pro survey to the first readers. Next bot build: Step 18, alert sign-up (item, state, dollar amount) on the site.

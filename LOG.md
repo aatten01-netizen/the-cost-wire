@@ -2,6 +2,14 @@
 
 Newest first.
 
+## 2026-11-12 — Step 17: Price-move alerts (mock sender) — extra run
+**Why this step:** alerts are the one core Pro feature on the pricing page; nothing can be sold without them.
+**Built:** `src/costwire/alerts.py`. A reader picks an item, a state and a dollar amount. After a pull, it compares the two newest published reports for that item and state (same USDA/EIA source and unit, at most 45 days apart; otherwise no alert, never a guess) and writes a short alert for every reader whose move hit their amount, up or down. Each alert has both prices, both dates, the source links, "Data, not advice" and "reply STOP". It remembers what it already alerted, so the same report never alerts twice. Sending is a MockSender only: no real email. Reader emails never go in this public repo: the list is a CSV outside it (`ALERTS_FILE`), and `alerts*.csv` is now git-ignored. 8 new tests (209 total, all pass). Dry run on real data: 0 alerts, correct (only one report date saved so far).
+**Try it:** `PYTHONPATH=src python3 -m pytest -q tests/test_alerts.py`; make a CSV outside the repo with `email,item,region,threshold` (e.g. `you@example.com,anhydrous,IA,25`) and run `ALERTS_FILE=/path/alerts.csv PYTHONPATH=src python3 -m costwire.alerts` (prints what would go out, sends nothing).
+**Andy:** nothing now. Not in the weekly job yet on purpose (no reader list exists).
+Marketing: Pro alerts announcement (brief P.S. + sample alert) (marketing/pro-alerts-announcement.md) - Andy: reply SEND/POST in chat to have it sent
+**Next:** Step 18, alert sign-up on the site (item, state, amount).
+
 ## 2026-11-12 — Step 16: Pricing page (Free vs Pro, mock checkout)
 **Why this step:** every PLAN step was done, and the new money-goal rule says pick what makes the product sellable sooner. A pricing page with checkout behind a mock is the first piece of a paid tier.
 **Built:** `src/costwire/pricing.py` writes `site/pricing.html` on every site build: Free ($0, what's live today) vs Pro (coming soon, $9/month or $90/year per BRIEF.md's $9-15 range), plus a short Q&A and the data-not-advice line. "Pricing" is in every page's nav. The Pro button is disabled ("Pro is not open yet") unless `PRO_CHECKOUT_URL` is a Stripe Payment Link (https://buy.stripe.com/...) AND `PRO_CHECKOUT_LIVE=yes`; anything else stays a mock. The free signup box now has `id="signup"` so the pricing page can link to it. Launch check has a new "Pricing page built" line (8 of 11 ready). Added `REVENUE.md`. 8 new tests (201 total, all pass). Pricing and home pages checked at 375px: no sideways scroll.

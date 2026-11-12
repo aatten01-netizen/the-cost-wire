@@ -32,3 +32,4 @@ Free weekly brief (web + email). Later paid tier (~$9-15/month per BRIEF.md): yo
 - [x] 10. $0-$20 ad test plan (marketing/ad-test-plan.md)
 - [x] 11. Launch checklist (marketing/launch-checklist.md)
 - [x] 12. Pro "would you pay?" check: 5-question reply survey for free readers (marketing/pro-interest-survey.md)
+- [x] 13. Pro alerts announcement: brief P.S. + sample alert (marketing/pro-alerts-announcement.md)
