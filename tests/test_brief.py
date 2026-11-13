@@ -153,3 +153,39 @@ def test_credit_names_only_agencies_in_the_brief():
 def test_table_rows_group_states_in_order_with_regional_last():
     rows = [{"region": r, "item": "ddgs"} for r in ["WI", "PADD2", "IL", "MN", "IA"]]
     assert [r["region"] for r in sorted(rows, key=brief.sort_key)] == ["IA", "IL", "MN", "WI", "PADD2"]
+
+
+def test_every_table_cell_is_labeled_for_phone_cards():
+    """On phones each price becomes a card; every cell needs its column name so the
+    date and source still show (they used to be hidden off the right edge)."""
+    page = brief.to_html(brief.build(sample(), DAY))
+    assert '<table class="prices">' in page and "@media (max-width: 600px)" in page
+    body = page.split("<tbody>")[1].split("</tbody>")[0]
+    rows = [r for r in body.split("<tr>") if r.strip()]
+    labels = ["Item", "Region", "Price", "vs 2 weeks ago", "vs 1 year ago", "As of", "Source"]
+    assert rows
+    for r in rows:
+        assert r.count("<td") == len(labels)
+        for label in labels:
+            assert f'data-label="{label}"' in r
+
+
+def test_phone_width_shows_date_and_source_without_sideways_scroll(tmp_path):
+    """Real browser check at 375px. Skipped if Playwright/Chromium isn't installed."""
+    import pytest
+    sync_api = pytest.importorskip("playwright.sync_api")
+    page_file = tmp_path / "brief.html"
+    page_file.write_text(brief.to_html(brief.build(sample(), DAY)), encoding="utf-8")
+    try:
+        with sync_api.sync_playwright() as p:
+            browser = p.chromium.launch()
+            page = browser.new_page(viewport={"width": 375, "height": 800})
+            page.goto(page_file.as_uri())
+            wrap = page.evaluate("(() => { const w = document.querySelector('.table-wrap');"
+                                 " return [w.scrollWidth, w.clientWidth]; })()")
+            source = page.locator("td[data-label='Source'] a").first.bounding_box()
+            browser.close()
+    except Exception as err:  # no browser on this machine
+        pytest.skip(f"no browser: {type(err).__name__}")
+    assert wrap[0] <= wrap[1]                     # nothing hidden to the right
+    assert source["x"] + source["width"] <= 375   # source link is on screen

@@ -317,12 +317,13 @@ def to_html(b: dict) -> str:
     title = f"The Cost Wire — week of {short_date(b['date'])}"
     rows = "\n".join(
         "<tr>"
-        f"<td>{e(item_name(r['item']))}</td><td>{e(region_name(r['region']))}</td>"
-        f"<td class=num>{e(money(r['price']) + per_unit(r['unit']))}</td>"
-        f"<td class=num>{e(signed_change(r['change_2w'], r['pct_2w']))}</td>"
-        f"<td class=num>{e(signed_change(r['change_1y'], r['pct_1y']))}</td>"
-        f"<td>{e(short_date(r['as_of']))}</td>"
-        f"<td><a href=\"{e(r['source_url'])}\">{e(r['source_name'])}</a></td>"
+        f"<td data-label=\"Item\">{e(item_name(r['item']))}</td>"
+        f"<td data-label=\"Region\">{e(region_name(r['region']))}</td>"
+        f"<td class=num data-label=\"Price\">{e(money(r['price']) + per_unit(r['unit']))}</td>"
+        f"<td class=num data-label=\"vs 2 weeks ago\">{e(signed_change(r['change_2w'], r['pct_2w']))}</td>"
+        f"<td class=num data-label=\"vs 1 year ago\">{e(signed_change(r['change_1y'], r['pct_1y']))}</td>"
+        f"<td data-label=\"As of\">{e(short_date(r['as_of']))}</td>"
+        f"<td data-label=\"Source\"><a href=\"{e(r['source_url'])}\">{e(r['source_name'])}</a></td>"
         "</tr>" for r in b["rows"])
     lines = "\n".join(f"<li>{e(line)}</li>" for line in b["lines"])
     srcs = "\n".join(
@@ -352,6 +353,13 @@ table {{ border-collapse: collapse; width: 100%; font-size: 0.95rem; }}
 th, td {{ border-bottom: 1px solid #ddd; padding: 0.4rem; text-align: left; }}
 td.num {{ text-align: right; white-space: nowrap; }}
 .table-wrap {{ overflow-x: auto; }}
+/* Phones: one small card per price, so the date and source are never hidden off to the side. */
+@media (max-width: 600px) {{
+  table.prices thead {{ display: none; }}
+  table.prices tr {{ display: block; border-bottom: 1px solid #ccc; padding: 0.4rem 0; }}
+  table.prices td {{ display: flex; justify-content: space-between; gap: 1rem; border: 0; padding: 0.15rem 0; text-align: right; white-space: normal; }}
+  table.prices td::before {{ content: attr(data-label); font-weight: bold; text-align: left; }}
+}}
 svg.trend {{ display: block; max-width: 100%; height: auto; }}
 ul.trends {{ list-style: none; padding-left: 0; }}
 ul.trends li {{ margin-bottom: 0.8rem; }}
@@ -362,7 +370,7 @@ ul.trends li {{ margin-bottom: 0.8rem; }}
 <h1>{e(title)}</h1>
 <h2>{e(b['headline'])}</h2>
 <div class="table-wrap">
-<table>
+<table class="prices">
 <thead><tr><th>Item</th><th>Region</th><th>Price</th><th>vs 2 weeks ago</th><th>vs 1 year ago</th><th>As of</th><th>Source</th></tr></thead>
 <tbody>
 {rows}
