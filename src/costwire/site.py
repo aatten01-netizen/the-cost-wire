@@ -5,6 +5,7 @@ Pages it writes:
   site/archive.html            list of every brief, newest first
   site/briefs/<date>.html      each brief (same content as briefs/<date>.html)
   site/pricing.html            Free vs Pro, mock checkout (see pricing.py)
+  site/alerts.html             price-move alert sign-up (see alert_signup.py)
   site/feed.xml                RSS feed of the briefs (see feed_rss.py)
   site/.nojekyll               tells GitHub Pages to serve files as they are
 
@@ -23,7 +24,7 @@ import shutil
 import sys
 from datetime import date
 
-from . import feed_rss, nass_land, pricing, rentpage
+from . import alert_signup, changes, feed_rss, nass_land, pricing, rentpage
 from .paths import BRIEFS_DIR, SITE_DIR
 
 BRIEF_NAME = re.compile(r"^(\d{4}-\d{2}-\d{2})\.html$")
@@ -61,7 +62,7 @@ def signup_box(env=None) -> str:
 
 
 SITE_CSS = """
-.sitenav { display: flex; gap: 1rem; padding-bottom: 0.5rem; border-bottom: 2px solid #222; font-family: Georgia, serif; }
+.sitenav { display: flex; flex-wrap: wrap; gap: 0.4rem 1rem; padding-bottom: 0.5rem; border-bottom: 2px solid #222; font-family: Georgia, serif; }
 .sitenav a { color: #222; }
 .sitenav .brand { font-weight: bold; margin-right: auto; text-decoration: none; }
 .signup { margin-top: 2rem; padding: 1rem; border: 1px solid #ddd; background: #f8f8f4; }
@@ -89,6 +90,7 @@ def nav(prefix: str) -> str:
             f'<a href="{prefix}index.html">Latest</a>'
             f'<a href="{prefix}cash-rent.html">Cash rent</a>'
             f'<a href="{prefix}archive.html">Archive</a>'
+            f'<a href="{prefix}alerts.html">Alerts</a>'
             f'<a href="{prefix}pricing.html">Pricing</a>'
             f'<a href="{prefix}feed.xml">RSS</a></nav>')
 
@@ -163,7 +165,17 @@ def pricing_page(env=None) -> str:
     return page[:start] + pricing.render(env) + "\n" + page[end:]
 
 
-def build_site(briefs_dir=None, site_dir=None, land_file=None) -> list:
+def alerts_page(rows, env=None) -> str:
+    """Alert sign-up page in the same page frame as the archive."""
+    page = archive_page([]).replace("<title>The Cost Wire — archive</title>",
+                                    "<title>The Cost Wire — price alerts</title>")
+    page = page.replace("</style>", alert_signup.ALERTS_CSS + "</style>", 1)
+    start = page.index("<h1>Archive</h1>")
+    end = page.index("</body>")
+    return page[:start] + alert_signup.render(rows, env) + "\n" + page[end:]
+
+
+def build_site(briefs_dir=None, site_dir=None, land_file=None, price_file=None) -> list:
     """Write the site. Returns the list of brief dates published (newest first)."""
     site_dir = site_dir or SITE_DIR
     files = brief_files(briefs_dir)
@@ -187,6 +199,8 @@ def build_site(briefs_dir=None, site_dir=None, land_file=None) -> list:
     (site_dir / "cash-rent.html").write_text(
         rent_page(nass_land.load_records(land_file)), encoding="utf-8")
     (site_dir / "pricing.html").write_text(pricing_page(), encoding="utf-8")
+    (site_dir / "alerts.html").write_text(
+        alerts_page(changes.read_rows(price_file)), encoding="utf-8")
     (site_dir / "archive.html").write_text(archive_page([d for d, _ in files]), encoding="utf-8")
     pages = [(d, path.read_text(encoding="utf-8")) for d, path in files]
     (site_dir / "feed.xml").write_text(

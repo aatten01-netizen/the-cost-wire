@@ -88,6 +88,7 @@ def render(env=None) -> str:
 <p class="price">${PRO_MONTHLY}/month or ${PRO_YEARLY}/year</p>
 {_ul(PRO_FEATURES)}
 {checkout_button(env)}
+<p><a href="alerts.html">See the alert choices</a></p>
 </section>
 </div>
 <h2>Questions</h2>

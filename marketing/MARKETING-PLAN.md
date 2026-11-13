@@ -33,3 +33,4 @@ Free weekly brief (web + email). Later paid tier (~$9-15/month per BRIEF.md): yo
 - [x] 11. Launch checklist (marketing/launch-checklist.md)
 - [x] 12. Pro "would you pay?" check: 5-question reply survey for free readers (marketing/pro-interest-survey.md)
 - [x] 13. Pro alerts announcement: brief P.S. + sample alert (marketing/pro-alerts-announcement.md)
+- [x] 14. Alert sign-up launch posts: brief P.S., AgTalk, Facebook, Commodity Wire line (marketing/alerts-page-launch-posts.md)

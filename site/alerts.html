@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Cost Wire — price alerts</title>
+<link rel="alternate" type="application/rss+xml" title="The Cost Wire" href="feed.xml">
+<style>
+body { font-family: Georgia, serif; max-width: 860px; margin: 2rem auto; padding: 0 1rem; color: #222; }
+
+.sitenav { display: flex; flex-wrap: wrap; gap: 0.4rem 1rem; padding-bottom: 0.5rem; border-bottom: 2px solid #222; font-family: Georgia, serif; }
+.sitenav a { color: #222; }
+.sitenav .brand { font-weight: bold; margin-right: auto; text-decoration: none; }
+.signup { margin-top: 2rem; padding: 1rem; border: 1px solid #ddd; background: #f8f8f4; }
+.signup input { padding: 0.4rem; max-width: 100%; }
+
+
+.alertform { display: flex; flex-direction: column; gap: 0.6rem; max-width: 420px; padding: 1rem; border: 1px solid #ddd; background: #f8f8f4; }
+.alertform label { display: flex; flex-direction: column; gap: 0.2rem; }
+.alertform input, .alertform select { padding: 0.4rem; max-width: 100%; font: inherit; }
+</style>
+</head>
+<body>
+<nav class="sitenav"><a class="brand" href="index.html">The Cost Wire</a><a href="index.html">Latest</a><a href="cash-rent.html">Cash rent</a><a href="archive.html">Archive</a><a href="alerts.html">Alerts</a><a href="pricing.html">Pricing</a><a href="feed.xml">RSS</a></nav>
+<h1>Price-move alerts</h1>
+<p>Pick an item, a state and a dollar amount. After each new USDA or EIA report, we email you if that published price moved at least that much, up or down, with both prices, both dates and the source link.</p>
+<form class="alertform" onsubmit="return false;">
+<label>Email <input type="email" placeholder="you@example.com" disabled></label>
+<label>Item and state <select disabled>
+<option value="anhydrous|IA">Iowa: Anhydrous ammonia</option>
+<option value="uan32|IA">Iowa: UAN 32%</option>
+<option value="map|IA">Iowa: MAP</option>
+<option value="potash|IA">Iowa: Potash</option>
+<option value="diesel|IA">Iowa: Farm diesel</option>
+<option value="propane|IA">Iowa: Propane</option>
+<option value="ddgs|IA">Iowa: Dried distillers grains (10%)</option>
+<option value="anhydrous|IL">Illinois: Anhydrous ammonia</option>
+<option value="urea|IL">Illinois: Urea</option>
+<option value="uan28|IL">Illinois: UAN 28%</option>
+<option value="uan32|IL">Illinois: UAN 32%</option>
+<option value="dap|IL">Illinois: DAP</option>
+<option value="map|IL">Illinois: MAP</option>
+<option value="potash|IL">Illinois: Potash</option>
+<option value="diesel|IL">Illinois: Farm diesel</option>
+<option value="ddgs|IL">Illinois: Dried distillers grains (10%)</option>
+<option value="ddgs|MN">Minnesota: Dried distillers grains (10%)</option>
+<option value="ddgs|WI">Wisconsin: Dried distillers grains (10%)</option>
+<option value="onhwy_diesel|PADD2">Midwest (PADD 2): On-highway diesel (retail)</option>
+<option value="res_propane|PADD2">Midwest (PADD 2): Residential propane</option>
+</select></label>
+<label>Alert me when it moves <select disabled>
+<option value="5">$5 or more</option>
+<option value="10">$10 or more</option>
+<option value="25">$25 or more</option>
+<option value="50">$50 or more</option>
+<option value="100">$100 or more</option>
+</select></label>
+<button type="button" disabled>Set my alert (coming soon)</button>
+</form>
+<p class="note">Alert sign-up is not open yet. Nothing you pick here is saved or sent.</p>
+<p class="note">Data, not advice. An alert reports a published average price; it is not a recommendation to buy or sell. Reply STOP to any alert to stop them. See <a href="pricing.html">Pricing</a>.</p>
+</body>
+</html>

@@ -57,6 +57,9 @@ jobs:
           NASS_API_KEY: ${{ secrets.NASS_API_KEY }}
           SIGNUP_FORM_URL: ${{ vars.SIGNUP_FORM_URL }}
           SIGNUP_LIVE: ${{ vars.SIGNUP_LIVE }}
+          ALERTS_SIGNUP_LIVE: ${{ vars.ALERTS_SIGNUP_LIVE }}
+          PRO_CHECKOUT_URL: ${{ vars.PRO_CHECKOUT_URL }}
+          PRO_CHECKOUT_LIVE: ${{ vars.PRO_CHECKOUT_LIVE }}
         run: python -m costwire.weekly
       - name: Commit the new data, brief and site
         if: steps.when.outputs.run == 'true'
