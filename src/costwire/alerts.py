@@ -10,9 +10,11 @@ from a CSV outside the repo, path in env var ALERTS_FILE, columns:
 Alerts already written are remembered in ALERTS_SENT_FILE (default: next to
 ALERTS_FILE, named alerts_sent.csv) so the same report never alerts twice.
 
-Sending: only MockSender exists. It keeps messages in memory / prints them.
-No real email is sent by this module. A real sender (Resend) is a later step
-and needs Andy's OK.
+Sending: MockSender (default) keeps messages in memory / prints them and sends
+nothing. ResendSender (Step 19) sends real email through Resend, but ONLY to
+Andy's one test address (BRIEF_TEST_EMAIL), never to a reader, and only when
+ALERTS_LIVE=yes AND RESEND_API_KEY AND BRIEF_TEST_EMAIL are all set. Each
+test email says which reader it was meant for. At most MAX_TEST_SENDS per run.
 
 Product rules: data, not advice (the alert reports a published move, nothing
 else); never guess (both prices must be real saved prices from the same
@@ -141,6 +143,8 @@ def find_alerts(subs: list[dict], rows: list[dict], already_sent: set = frozense
 
 
 class MockSender:
+    live = False
+
     """Pretend sender: keeps every message so tests and dry runs can read it. Sends nothing."""
 
     def __init__(self):
@@ -150,22 +154,86 @@ class MockSender:
         self.sent.append({"to": to, "subject": subject, "body": body})
 
 
+MAX_TEST_SENDS = 10  # never flood Andy's inbox in one run
+DEFAULT_FROM = "The Cost Wire <onboarding@resend.dev>"  # Resend's shared test sender
+
+
+def _one_address(addr: str) -> str:
+    addr = (addr or "").strip()
+    if not addr or "@" not in addr or any(c in addr for c in ",; "):
+        raise ValueError("The alert test address must be ONE email address.")
+    return addr
+
+
+class ResendSender:
+    """Real email through Resend, but every message goes to ONE test address (Andy).
+
+    The reader it was meant for is named in the subject and first line, so Andy
+    can check the alert, but the reader receives nothing. `post` is injectable
+    so tests never call Resend.
+    """
+    live = True
+
+    def __init__(self, api_key: str, test_to: str, post=None, sender=DEFAULT_FROM,
+                 max_sends=MAX_TEST_SENDS):
+        if not api_key:
+            raise ValueError("RESEND_API_KEY is missing.")
+        self.api_key = api_key
+        self.test_to = _one_address(test_to)
+        self.sender = sender
+        self.max_sends = max_sends
+        if post is None:
+            from .email_brief import _post as post
+        self.post = post
+        self.sent = []
+
+    def send(self, to: str, subject: str, body: str) -> None:
+        if len(self.sent) >= self.max_sends:
+            raise RuntimeError(f"Test send limit reached ({self.max_sends} per run).")
+        from .email_brief import RESEND_URL
+        payload = {
+            "from": self.sender,
+            "to": [self.test_to],  # ALWAYS the test address, never the reader
+            "subject": f"[TEST for {to}] {subject}",
+            "text": f"(Test alert. Meant for reader {to}; they were NOT emailed.)\n\n{body}",
+        }
+        self.post(RESEND_URL, {"Authorization": f"Bearer {self.api_key}"}, payload)
+        self.sent.append({"to": self.test_to, "subject": payload["subject"], "body": payload["text"]})
+
+
+def pick_sender(env=None, post=None):
+    """ResendSender only if ALERTS_LIVE=yes and the key + test address are set; else MockSender."""
+    env = os.environ if env is None else env
+    if (env.get("ALERTS_LIVE") or "").strip().lower() != "yes":
+        return MockSender()
+    key = (env.get("RESEND_API_KEY") or "").strip()
+    test_to = (env.get("BRIEF_TEST_EMAIL") or "").strip()
+    if not key or not test_to:
+        print("ALERTS_LIVE=yes but RESEND_API_KEY or BRIEF_TEST_EMAIL is missing: using the mock sender.")
+        return MockSender()
+    return ResendSender(key, test_to, post=post)
+
+
 def run(alerts_file, sent_file, rows, sender) -> int:
     """Find alerts, hand them to `sender`, remember them. Returns how many."""
     subs = load_subscriptions(alerts_file)
     already = _sent_keys(sent_file)
     alerts = find_alerts(subs, rows, already)
-    for a in alerts:
-        sender.send(a["to"], a["subject"], a["body"])
-    if alerts:
-        sent_file = Path(sent_file)
-        new_file = not sent_file.exists()
-        with open(sent_file, "a", newline="", encoding="utf-8") as f:
-            w = csv.writer(f)
-            if new_file:
-                w.writerow(SENT_COLUMNS)
-            w.writerows(a["key"] for a in alerts)
-    return len(alerts)
+    done = []
+    try:
+        for a in alerts:
+            sender.send(a["to"], a["subject"], a["body"])
+            done.append(a)
+    finally:  # remember only what really went out, even if a send failed midway
+        if done:
+            sent_file = Path(sent_file)
+            new_file = not sent_file.exists()
+            with open(sent_file, "a", newline="", encoding="utf-8") as f:
+                w = csv.writer(f)
+                if new_file:
+                    w.writerow(SENT_COLUMNS)
+                w.writerows(a["key"] for a in done)
+    return len(done)
 
 
 def main(argv=None) -> int:
@@ -175,11 +243,22 @@ def main(argv=None) -> int:
         return 0
     sent_file = os.environ.get("ALERTS_SENT_FILE", "").strip() or str(
         Path(alerts_file).with_name("alerts_sent.csv"))
-    sender = MockSender()
-    n = run(alerts_file, sent_file, changes.read_rows(), sender)
-    for m in sender.sent:  # dry run: show what would go out, without the address
-        print(f"--- (mock, not sent) {m['subject']}\n{m['body']}\n")
-    print(f"{n} alert(s) written by the mock sender. No real email was sent.")
+    sender = pick_sender()
+    if not sender.live and (os.environ.get("ALERTS_LIVE") or "").strip().lower() == "yes":
+        # Live was asked for but the key/address is missing: don't mark alerts as
+        # sent, or the real test send later would skip them.
+        sent_file = str(Path(sent_file).with_name("alerts_sent_mock.csv"))
+    try:
+        n = run(alerts_file, sent_file, changes.read_rows(), sender)
+    except Exception as e:  # never print the key; error type only
+        print(f"Alert send failed: {type(e).__name__}: {e}"[:300], file=sys.stderr)
+        return 1
+    if sender.live:
+        print(f"{n} TEST alert(s) sent to the test address only. No reader was emailed.")
+    else:
+        for m in sender.sent:  # dry run: show what would go out, without the address
+            print(f"--- (mock, not sent) {m['subject']}\n{m['body']}\n")
+        print(f"{n} alert(s) written by the mock sender. No real email was sent.")
     return 0
 
 

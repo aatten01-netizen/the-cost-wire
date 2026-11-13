@@ -29,7 +29,7 @@ One step per weekly build session. Do the first unchecked step, then check it of
 - [x] 16. Pricing page: `site/pricing.html` with Free vs Pro ($9/mo or $90/yr, planned), linked from every page's nav. Pro checkout is a mock (disabled) unless `PRO_CHECKOUT_URL` (Stripe Payment Link) + `PRO_CHECKOUT_LIVE=yes`. Tests.
 - [x] 17. Price-move alerts (the core Pro feature): readers pick an item, state and dollar threshold; after each weekly pull, find who should be alerted from published prices only; send through a mock sender (no real emails). Tests.
 - [x] 18. Alert sign-up: readers choose item, state and dollar amount on the site (adds columns to the Google Sheet signup, docs updated); export to the ALERTS_FILE format. Tests.
-- [ ] 19. Real alert sender through Resend, test address only (Andy), off unless ALERTS_LIVE=yes. Tests with a mock.
+- [x] 19. Real alert sender through Resend, test address only (Andy), off unless ALERTS_LIVE=yes. Tests with a mock.
 
 ## From market scan
 - [ ] (Nov 12 scan) Cost per pound of N line on the brief: anhydrous (82%), urea (46%), UAN28 (28%)/UAN32 (32%) for IA and IL = AMS $/ton ÷ (2000 × N%), each with its source URL and date; leave out any item with a missing price; number only, no advice. Tests — why: farmers compare N sources per pound of N, https://www.farms.com/agriculture-apps/technology/n-price-calculator (search result only; page not opened this run, verify)
