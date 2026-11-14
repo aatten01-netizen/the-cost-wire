@@ -2,6 +2,14 @@
 
 Newest first.
 
+## 2026-11-14 — Market-scan step: Sample Pro alert page (night shift)
+**Why this step first:** it was listed after the cost-per-pound-of-N line, but showing a buyer the alert they'd get helps sell Pro sooner (money rule).
+**Built:** `src/costwire/pro_sample.py` writes `site/pro-sample.html` on every site build, linked from the pricing page ("See a sample Pro alert"). It uses the exact same move finder and email text as the real alerts, built only from `data/fertilizer.csv`: it picks the biggest real move (in %) of at least $5 between two saved reports (same source and unit, at most 45 days apart) and shows the email a Pro reader with the matching setting (e.g. "$25 or more") would have gotten, plus the source links. No reader email on the page. **Today it honestly says "No sample yet"**: every item has only one saved report date (Oct 30 / Nov 2), so there is no real move, and no number is made up. It fills in by itself after the next report is pulled. 8 new tests (237 pass, 1 skipped). Site rebuilt, accuracy check passes, page checked at 375px with no sideways scroll.
+**Try it:** `PYTHONPATH=src python3 -m pytest -q tests/test_pro_sample.py`; `PYTHONPATH=src python3 -m costwire.site`, open `site/pro-sample.html`.
+**Andy:** nothing new. Biggest blocker to a first dollar is still turning on the signup form (docs/signup-google-sheet.md).
+Marketing: "See a sample Pro alert" share posts (marketing/pro-sample-share-posts.md; post only once the page shows a real move) - Andy: reply SEND/POST in chat to have it sent
+**Next:** market-scan step "cost per pound of N" line on the brief.
+
 ## 2026-11-13 — QA (the-cost-wire, 5:43 PM run)
 **Checked:** 228 tests pass (`python3 -m pip install -r requirements.txt cffi pytest`). In a scratch copy ran the full weekly job offline (pulls fail on network as expected, then changes → brief → accuracy check → site all pass) and the launch check (8 of 11 ready; the 3 open items are Andy's). Opened all 6 pages at phone width (375px) in Chromium: no page errors, no broken local links, disclaimer on every page.
 **Found:** on a phone, the weekly price table only showed Item, Region, Price and the two change columns. The **As of** date and **Source** link (the two things every number must show) were hidden off the right edge with no hint you could swipe, and the hidden Source column made every row about 3 lines tall.

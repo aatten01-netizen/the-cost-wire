@@ -35,3 +35,4 @@ Free weekly brief (web + email). Later paid tier (~$9-15/month per BRIEF.md): yo
 - [x] 13. Pro alerts announcement: brief P.S. + sample alert (marketing/pro-alerts-announcement.md)
 - [x] 14. Alert sign-up launch posts: brief P.S., AgTalk, Facebook, Commodity Wire line (marketing/alerts-page-launch-posts.md)
 - [x] 15. Pro alerts founding-tester invite: email + short message for the first 5 free readers (marketing/pro-alerts-beta-invite.md)
+- [x] 16. "See a sample Pro alert" share posts: brief P.S., Facebook, Commodity Wire line, reply (marketing/pro-sample-share-posts.md)
