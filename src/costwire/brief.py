@@ -5,6 +5,7 @@ No AI, just a template. The brief has:
     (or vs 1 year ago if there are no 2-week changes yet)
   - a table: every price, its change vs 2 weeks and 1 year ago, date, source
   - one "what changed" line per item
+  - bushels of corn per ton, cost per pound of N, and 12-week trends (when the data allows)
   - the sources (with links and dates)
   - a disclaimer (data, not advice)
 
@@ -24,7 +25,7 @@ import sys
 from datetime import date, datetime
 from zoneinfo import ZoneInfo
 
-from . import affordability, changes, corn_price, trend
+from . import affordability, changes, corn_price, nitrogen, trend
 from .paths import BRIEFS_DIR
 
 ITEM_NAMES = {
@@ -242,6 +243,21 @@ def afford_sources(afford: list[dict]) -> list[dict]:
     return out
 
 
+NITROGEN_TITLE = "Cost per pound of nitrogen"
+NITROGEN_NOTE = ("Each nitrogen fertilizer's price (USDA AMS, newest report) divided by the "
+                 "pounds of N in a ton, from the product's grade: anhydrous 82-0-0 (1,640 lb), "
+                 "urea 46-0-0 (920 lb), UAN 28-0-0 (560 lb), UAN 32-0-0 (640 lb). Product "
+                 "price only, not application cost. Left out when a price is missing.")
+
+
+def nitrogen_line(n: dict) -> str:
+    """One plain sentence per N product + state. Numbers only, no advice."""
+    return (f"{region_name(n['region'])} {item_in_sentence(n['item'])}: "
+            f"{money(n['per_lb'])} per lb of N "
+            f"({money(n['price'])}/ton as of {short_date(n['as_of'])} "
+            f"÷ {n['lb_n']:,} lb of N per ton, {nitrogen.GRADE[n['item']]}).")
+
+
 TREND_TITLE = "12-week price trend"
 TREND_NOTE = ("Every saved price for each fertilizer over the last 12 weeks, from the same "
               "USDA AMS report as the table above. Shown only when at least 2 dates are saved.")
@@ -273,6 +289,7 @@ def build(results: list[dict], brief_date: date, corn_prices=None, history=None)
         "lines": [what_changed(r) for r in rows],
         "afford": [afford_line(a) for a in afford],
         "afford_sources": afford_sources(afford),
+        "nitrogen": [nitrogen_line(n) for n in nitrogen.compute(results)],
         "trends": [{"line": trend_line(t),
                     "svg": trend.svg(t["points"], f"{TREND_TITLE}: {trend_line(t)}")}
                    for t in trends],
@@ -301,6 +318,9 @@ def to_markdown(b: dict) -> str:
     if b.get("afford"):
         out += ["", f"## {AFFORD_TITLE}", "", AFFORD_NOTE, ""]
         out += [f"- {line}" for line in b["afford"]]
+    if b.get("nitrogen"):
+        out += ["", f"## {NITROGEN_TITLE}", "", NITROGEN_NOTE, ""]
+        out += [f"- {line}" for line in b["nitrogen"]]
     if b.get("trends"):
         out += ["", f"## {TREND_TITLE}", "", TREND_NOTE, ""]
         out += [f"- {t['line']}" for t in b["trends"]]
@@ -336,6 +356,11 @@ def to_html(b: dict) -> str:
         items = "\n".join(f"<li>{e(line)}</li>" for line in b["afford"])
         afford = (f"<h2>{e(AFFORD_TITLE)}</h2>\n<p class=\"note\">{e(AFFORD_NOTE)}</p>\n"
                   f"<ul>\n{items}\n</ul>\n")
+    nitro = ""
+    if b.get("nitrogen"):
+        items = "\n".join(f"<li>{e(line)}</li>" for line in b["nitrogen"])
+        nitro = (f"<h2>{e(NITROGEN_TITLE)}</h2>\n<p class=\"note\">{e(NITROGEN_NOTE)}</p>\n"
+                 f"<ul>\n{items}\n</ul>\n")
     trends = ""
     if b.get("trends"):
         items = "\n".join(f"<li>{t['svg']}<br>{e(t['line'])}</li>" for t in b["trends"])
@@ -382,7 +407,7 @@ ul.trends li {{ margin-bottom: 0.8rem; }}
 <ul>
 {lines}
 </ul>
-{afford}{trends}<h2>Sources</h2>
+{afford}{nitro}{trends}<h2>Sources</h2>
 <ul>
 {srcs}
 </ul>

@@ -2,6 +2,13 @@
 
 Newest first.
 
+## 2026-11-14 — Market-scan step: Cost per pound of N line
+**Built:** `src/costwire/nitrogen.py` + a new "Cost per pound of nitrogen" section in the weekly brief (Markdown, web page and email). For Iowa and Illinois anhydrous, urea, UAN28 and UAN32: USDA AMS $/ton ÷ pounds of N in a ton (from the product grade: 82-0-0 = 1,640 lb, 46-0-0 = 920, 28-0-0 = 560, 32-0-0 = 640), each line showing the price, report date and the math. Any item with no saved price is left out (today: Iowa urea and UAN28 aren't in the saved Iowa report, so they're skipped). Numbers only, no "best buy". The accuracy check now also checks these lines against the data (a changed or missing line stops the build). Rebuilt the Nov 9 brief and site (only the new section added; accuracy check passes; 375px, no sideways scroll). 7 new tests, 244 pass.
+**Try it:** `PYTHONPATH=src python3 -m pytest -q tests/test_nitrogen.py`; open `briefs/2026-11-09.md` and look for "Cost per pound of nitrogen" (e.g. Iowa anhydrous $0.55/lb N).
+**Andy:** nothing new. Biggest blocker to a first dollar is still turning on the signup form (docs/signup-google-sheet.md).
+Marketing: "Cost per pound of N" share posts (marketing/n-cost-share-posts.md) - Andy: reply SEND/POST in chat to have it sent
+**Next:** every PLAN step is checked off. Next run needs a new market scan or PLAN step from Andy.
+
 ## 2026-11-14 — Market-scan step: Sample Pro alert page (night shift)
 **Why this step first:** it was listed after the cost-per-pound-of-N line, but showing a buyer the alert they'd get helps sell Pro sooner (money rule).
 **Built:** `src/costwire/pro_sample.py` writes `site/pro-sample.html` on every site build, linked from the pricing page ("See a sample Pro alert"). It uses the exact same move finder and email text as the real alerts, built only from `data/fertilizer.csv`: it picks the biggest real move (in %) of at least $5 between two saved reports (same source and unit, at most 45 days apart) and shows the email a Pro reader with the matching setting (e.g. "$25 or more") would have gotten, plus the source links. No reader email on the page. **Today it honestly says "No sample yet"**: every item has only one saved report date (Oct 30 / Nov 2), so there is no real move, and no number is made up. It fills in by itself after the next report is pulled. 8 new tests (237 pass, 1 skipped). Site rebuilt, accuracy check passes, page checked at 375px with no sideways scroll.

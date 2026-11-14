@@ -12,6 +12,7 @@ Runs before each weekly build. It checks two things:
      fertilizer + NASS corn prices exactly, and each NASS link must be listed
      in Sources. The saved corn prices need a real value and an https link.
   4. The "12-week price trend" lines: each must match the saved prices exactly.
+  5. The "cost per pound of nitrogen" lines: each must match the saved prices exactly.
 
 Anything wrong is printed as a plain-English problem and the check fails
 (exit code 1), which stops the weekly build so a bad number never goes out.
@@ -197,6 +198,17 @@ def check_trend(markdown: str, results: list[dict], rows: list[dict]) -> list[st
     return problems
 
 
+def check_nitrogen(markdown: str, results: list[dict]) -> list[str]:
+    """The $/lb-of-N lines must match the saved prices exactly, nothing extra or missing."""
+    found = section_lines(markdown, brief.NITROGEN_TITLE)
+    wanted = brief.build(results, date.today())["nitrogen"]
+    problems = [f"Brief: nitrogen line not in the saved data: '{line}'"
+                for line in found if line not in wanted]
+    problems += [f"Brief: nitrogen line in the data but missing from the brief: '{line}'"
+                 for line in wanted if line not in found]
+    return problems
+
+
 def newest_brief(out_dir=None):
     files = sorted(Path(out_dir or BRIEFS_DIR).glob("*.md"))
     return files[-1] if files else None
@@ -212,7 +224,7 @@ def run_checks(brief_path=None, data_path=None, today=None, corn_path=None) -> l
     results = changes.compute(rows)
     text = path.read_text(encoding="utf-8")
     return (problems + check_brief(text, results) + check_afford(text, results, corn_prices)
-            + check_trend(text, results, rows))
+            + check_trend(text, results, rows) + check_nitrogen(text, results))
 
 
 def main(argv=None) -> int:
