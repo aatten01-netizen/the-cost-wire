@@ -8,6 +8,8 @@ Pages it writes:
   site/alerts.html             price-move alert sign-up (see alert_signup.py)
   site/pro-sample.html         sample Pro alert from a real saved move (see pro_sample.py)
   site/worksheet.html          cost-per-acre worksheet, Pro preview (see worksheet.py)
+  site/state/<st>.html         state editions of the newest brief, Pro preview (see state_brief.py)
+  site/state/index.html        list of the state editions
   site/feed.xml                RSS feed of the briefs (see feed_rss.py)
   site/.nojekyll               tells GitHub Pages to serve files as they are
 
@@ -26,7 +28,8 @@ import shutil
 import sys
 from datetime import date
 
-from . import alert_signup, changes, feed_rss, nass_land, pricing, pro_sample, rentpage, worksheet
+from . import (alert_signup, changes, corn_price, feed_rss, nass_land, pricing, pro_sample,
+               rentpage, state_brief, worksheet)
 from .paths import BRIEFS_DIR, SITE_DIR
 
 BRIEF_NAME = re.compile(r"^(\d{4}-\d{2}-\d{2})\.html$")
@@ -197,7 +200,32 @@ def worksheet_page(rows) -> str:
     return page[:start] + worksheet.render(rows) + "\n" + page[end:]
 
 
-def build_site(briefs_dir=None, site_dir=None, land_file=None, price_file=None) -> list:
+def state_index_page(states, brief_date) -> str:
+    """List of state editions, in the archive page frame, one folder down (site/state/)."""
+    page = archive_page([]).replace("<title>The Cost Wire — archive</title>",
+                                    "<title>The Cost Wire — your state's brief</title>")
+    page = page.replace(nav(""), nav("../"), 1).replace(feed_link(""), feed_link("../"), 1)
+    start = page.index("<h1>Archive</h1>")
+    end = page.index("</body>")
+    return page[:start] + state_brief.index_body(states, brief_date) + "\n" + page[end:]
+
+
+def write_state_pages(site_dir, rows, brief_date, corn_file=None) -> list:
+    """Write site/state/ (rebuilt from scratch). Returns the states written."""
+    out = site_dir / "state"
+    if out.exists():
+        shutil.rmtree(out)
+    out.mkdir(parents=True, exist_ok=True)
+    pages = state_brief.build_all(rows, brief_date, corn_price.load_prices(corn_file)) \
+        if (rows and brief_date) else {}
+    for state, page in pages.items():
+        (out / f"{state.lower()}.html").write_text(wrap_brief(page, "../", False), encoding="utf-8")
+    (out / "index.html").write_text(state_index_page(list(pages), brief_date), encoding="utf-8")
+    return list(pages)
+
+
+def build_site(briefs_dir=None, site_dir=None, land_file=None, price_file=None,
+               corn_file=None) -> list:
     """Write the site. Returns the list of brief dates published (newest first)."""
     site_dir = site_dir or SITE_DIR
     files = brief_files(briefs_dir)
@@ -225,6 +253,7 @@ def build_site(briefs_dir=None, site_dir=None, land_file=None, price_file=None) 
     (site_dir / "alerts.html").write_text(alerts_page(rows), encoding="utf-8")
     (site_dir / "pro-sample.html").write_text(pro_sample_page(rows), encoding="utf-8")
     (site_dir / "worksheet.html").write_text(worksheet_page(rows), encoding="utf-8")
+    write_state_pages(site_dir, rows, files[0][0] if files else None, corn_file)
     (site_dir / "archive.html").write_text(archive_page([d for d, _ in files]), encoding="utf-8")
     pages = [(d, path.read_text(encoding="utf-8")) for d, path in files]
     (site_dir / "feed.xml").write_text(

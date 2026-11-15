@@ -274,16 +274,27 @@ def trend_line(t: dict) -> str:
             f"low {money(pl)}{u} ({short_date(dl)}), high {money(ph)}{u} ({short_date(dh)}).")
 
 
-def build(results: list[dict], brief_date: date, corn_prices=None, history=None) -> dict:
+def title(b: dict) -> str:
+    """'The Cost Wire — week of Nov 9, 2026', or with an edition: '... — Iowa edition, week of ...'."""
+    edition = b.get("edition")
+    if edition:
+        return f"The Cost Wire — {region_name(edition)} edition, week of {short_date(b['date'])}"
+    return f"The Cost Wire — week of {short_date(b['date'])}"
+
+
+def build(results: list[dict], brief_date: date, corn_prices=None, history=None,
+          edition=None) -> dict:
     """Everything the templates need, in one dict.
 
     history = all saved price rows (for the 12-week trend); without it, no trend.
+    edition = a state code (e.g. "IA") for a state edition; None for the main brief.
     """
     rows = sorted(results, key=sort_key)
     afford = affordability.compute(results, corn_prices or [])
     trends = trend.compute(rows, history or [])
     return {
         "date": brief_date,
+        "edition": edition,
         "headline": headline(rows),
         "rows": rows,
         "lines": [what_changed(r) for r in rows],
@@ -301,7 +312,7 @@ def build(results: list[dict], brief_date: date, corn_prices=None, history=None)
 # ---------- the two templates ----------
 
 def to_markdown(b: dict) -> str:
-    out = [f"# The Cost Wire — week of {short_date(b['date'])}", "",
+    out = [f"# {title(b)}", "",
            f"## {b['headline']}", "",
            "| Item | Region | Price | vs 2 weeks ago | vs 1 year ago | As of | Source |",
            "|---|---|---|---|---|---|---|"]
@@ -334,7 +345,7 @@ def to_markdown(b: dict) -> str:
 
 def to_html(b: dict) -> str:
     e = html.escape
-    title = f"The Cost Wire — week of {short_date(b['date'])}"
+    page_title = title(b)
     rows = "\n".join(
         "<tr>"
         f"<td data-label=\"Item\">{e(item_name(r['item']))}</td>"
@@ -371,7 +382,7 @@ def to_html(b: dict) -> str:
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>{e(title)}</title>
+<title>{e(page_title)}</title>
 <style>
 body {{ font-family: Georgia, serif; max-width: 860px; margin: 2rem auto; padding: 0 1rem; color: #222; }}
 table {{ border-collapse: collapse; width: 100%; font-size: 0.95rem; }}
@@ -392,7 +403,7 @@ ul.trends li {{ margin-bottom: 0.8rem; }}
 </style>
 </head>
 <body>
-<h1>{e(title)}</h1>
+<h1>{e(page_title)}</h1>
 <h2>{e(b['headline'])}</h2>
 <div class="table-wrap">
 <table class="prices">

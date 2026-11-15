@@ -37,3 +37,4 @@ One step per weekly build session. Do the first unchecked step, then check it of
 
 ## Added by build bot (Nov 15)
 - [x] 20. Cost-per-acre worksheet (the Pro feature promised on the pricing page that wasn't built): `site/worksheet.html`, farmer types their own rates (no defaults), newest published USDA AMS price per state with date + source, optional own quote per line, total $/acre; all in the browser, sends nothing. Linked from pricing. Tests.
+- [x] 21. State editions of the brief (the last Pro feature on the pricing page that wasn't built): `site/state/<st>.html` for each state with its own published prices (IA, IL, MN, WI), only that state's rows + Midwest (PADD 2) fuel, headline = the state's biggest move, accuracy check on each edition before it's written; `site/state/index.html`; linked from pricing. Tests.
