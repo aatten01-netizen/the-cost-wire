@@ -7,6 +7,7 @@ Pages it writes:
   site/pricing.html            Free vs Pro, mock checkout (see pricing.py)
   site/alerts.html             price-move alert sign-up (see alert_signup.py)
   site/pro-sample.html         sample Pro alert from a real saved move (see pro_sample.py)
+  site/worksheet.html          cost-per-acre worksheet, Pro preview (see worksheet.py)
   site/feed.xml                RSS feed of the briefs (see feed_rss.py)
   site/.nojekyll               tells GitHub Pages to serve files as they are
 
@@ -25,7 +26,7 @@ import shutil
 import sys
 from datetime import date
 
-from . import alert_signup, changes, feed_rss, nass_land, pricing, pro_sample, rentpage
+from . import alert_signup, changes, feed_rss, nass_land, pricing, pro_sample, rentpage, worksheet
 from .paths import BRIEFS_DIR, SITE_DIR
 
 BRIEF_NAME = re.compile(r"^(\d{4}-\d{2}-\d{2})\.html$")
@@ -186,6 +187,16 @@ def pro_sample_page(rows) -> str:
     return page[:start] + pro_sample.render(rows) + "\n" + page[end:]
 
 
+def worksheet_page(rows) -> str:
+    """Cost-per-acre worksheet in the same page frame as the archive."""
+    page = archive_page([]).replace("<title>The Cost Wire — archive</title>",
+                                    "<title>The Cost Wire — cost-per-acre worksheet</title>")
+    page = page.replace("</style>", worksheet.WORKSHEET_CSS + "</style>", 1)
+    start = page.index("<h1>Archive</h1>")
+    end = page.index("</body>")
+    return page[:start] + worksheet.render(rows) + "\n" + page[end:]
+
+
 def build_site(briefs_dir=None, site_dir=None, land_file=None, price_file=None) -> list:
     """Write the site. Returns the list of brief dates published (newest first)."""
     site_dir = site_dir or SITE_DIR
@@ -213,6 +224,7 @@ def build_site(briefs_dir=None, site_dir=None, land_file=None, price_file=None) 
     rows = changes.read_rows(price_file)
     (site_dir / "alerts.html").write_text(alerts_page(rows), encoding="utf-8")
     (site_dir / "pro-sample.html").write_text(pro_sample_page(rows), encoding="utf-8")
+    (site_dir / "worksheet.html").write_text(worksheet_page(rows), encoding="utf-8")
     (site_dir / "archive.html").write_text(archive_page([d for d, _ in files]), encoding="utf-8")
     pages = [(d, path.read_text(encoding="utf-8")) for d, path in files]
     (site_dir / "feed.xml").write_text(

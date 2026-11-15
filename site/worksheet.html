@@ -1,0 +1,153 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Cost Wire — cost-per-acre worksheet</title>
+<link rel="alternate" type="application/rss+xml" title="The Cost Wire" href="feed.xml">
+<style>
+body { font-family: Georgia, serif; max-width: 860px; margin: 2rem auto; padding: 0 1rem; color: #222; }
+
+.sitenav { display: flex; flex-wrap: wrap; gap: 0.4rem 1rem; padding-bottom: 0.5rem; border-bottom: 2px solid #222; font-family: Georgia, serif; }
+.sitenav a { color: #222; }
+.sitenav .brand { font-weight: bold; margin-right: auto; text-decoration: none; }
+.signup { margin-top: 2rem; padding: 1rem; border: 1px solid #ddd; background: #f8f8f4; }
+.signup input { padding: 0.4rem; max-width: 100%; }
+
+
+.ws { border-collapse: collapse; width: 100%; }
+.ws th, .ws td { border-bottom: 1px solid #ddd; padding: 0.35rem; text-align: left; vertical-align: top; }
+.ws input { width: 6.5rem; font: inherit; }
+.ws .cost { font-weight: bold; white-space: nowrap; }
+.ws-total { font-size: 1.15rem; }
+.note { color: #555; font-size: 0.9rem; }
+@media (max-width: 600px) {
+  .ws thead { display: none; }
+  .ws tr { display: block; border: 1px solid #ddd; margin-bottom: 0.6rem; padding: 0.3rem; }
+  .ws td { display: block; border: none; padding: 0.2rem 0.3rem; }
+  .ws td::before { content: attr(data-label) ": "; font-weight: bold; }
+}
+</style>
+</head>
+<body>
+<nav class="sitenav"><a class="brand" href="index.html">The Cost Wire</a><a href="index.html">Latest</a><a href="cash-rent.html">Cash rent</a><a href="archive.html">Archive</a><a href="alerts.html">Alerts</a><a href="pricing.html">Pricing</a><a href="feed.xml">RSS</a></nav>
+<h1>Cost-per-acre worksheet</h1>
+<p>Type your own rates per acre. The worksheet multiplies each one by the newest published USDA price for your state and adds up your cost per acre. Got your own quote? Type it in and that line uses your number instead.</p>
+<p class="note">Pro preview: free to try while Pro is not open (<a href="pricing.html">Pricing</a>).</p>
+<div id="ws-js" hidden>
+<p><label for="ws-state">State:</label> <select id="ws-state">
+<option value="IA">Iowa</option>
+<option value="IL">Illinois</option>
+</select></p>
+<table class="ws">
+<thead><tr><th>Product</th><th>Published price</th><th>Your rate</th><th>Your quote (optional)</th><th>$/acre</th></tr></thead>
+<tbody id="ws-body"></tbody>
+</table>
+<p class="ws-total">Total: <strong id="ws-total">Type a rate to see your cost per acre.</strong></p>
+<p class="note">Rates: fertilizer in pounds of product per acre (not pounds of N), farm diesel in gallons per acre. Products with no published price for a state are left out.</p>
+</div>
+<div id="ws-nojs">
+<p>The worksheet needs JavaScript. Here are the published prices it uses:</p>
+<h2>Iowa</h2>
+<ul>
+<li>Iowa Anhydrous ammonia: $902.33/ton, Oct 30, 2026 (<a href="https://www.ams.usda.gov/mnreports/ams_2863.pdf">USDA AMS Iowa Production Cost Report</a>)</li>
+<li>Iowa UAN 32%: $510.00/ton, Oct 30, 2026 (<a href="https://www.ams.usda.gov/mnreports/ams_2863.pdf">USDA AMS Iowa Production Cost Report</a>)</li>
+<li>Iowa MAP: $976.00/ton, Oct 30, 2026 (<a href="https://www.ams.usda.gov/mnreports/ams_2863.pdf">USDA AMS Iowa Production Cost Report</a>)</li>
+<li>Iowa Potash: $499.80/ton, Oct 30, 2026 (<a href="https://www.ams.usda.gov/mnreports/ams_2863.pdf">USDA AMS Iowa Production Cost Report</a>)</li>
+<li>Iowa Farm diesel: $5.65/gal, Oct 30, 2026 (<a href="https://www.ams.usda.gov/mnreports/ams_2863.pdf">USDA AMS Iowa Production Cost Report</a>)</li>
+</ul>
+<h2>Illinois</h2>
+<ul>
+<li>Illinois Anhydrous ammonia: $981.11/ton, Oct 30, 2026 (<a href="https://www.ams.usda.gov/mnreports/ams_3195.pdf">USDA AMS Illinois Production Cost Report</a>)</li>
+<li>Illinois Urea: $770.00/ton, Oct 30, 2026 (<a href="https://www.ams.usda.gov/mnreports/ams_3195.pdf">USDA AMS Illinois Production Cost Report</a>)</li>
+<li>Illinois UAN 28%: $467.86/ton, Oct 30, 2026 (<a href="https://www.ams.usda.gov/mnreports/ams_3195.pdf">USDA AMS Illinois Production Cost Report</a>)</li>
+<li>Illinois UAN 32%: $540.00/ton, Oct 30, 2026 (<a href="https://www.ams.usda.gov/mnreports/ams_3195.pdf">USDA AMS Illinois Production Cost Report</a>)</li>
+<li>Illinois DAP: $932.14/ton, Oct 30, 2026 (<a href="https://www.ams.usda.gov/mnreports/ams_3195.pdf">USDA AMS Illinois Production Cost Report</a>)</li>
+<li>Illinois MAP: $948.00/ton, Oct 30, 2026 (<a href="https://www.ams.usda.gov/mnreports/ams_3195.pdf">USDA AMS Illinois Production Cost Report</a>)</li>
+<li>Illinois Potash: $517.73/ton, Oct 30, 2026 (<a href="https://www.ams.usda.gov/mnreports/ams_3195.pdf">USDA AMS Illinois Production Cost Report</a>)</li>
+<li>Illinois Farm diesel: $5.71/gal, Oct 30, 2026 (<a href="https://www.ams.usda.gov/mnreports/ams_3195.pdf">USDA AMS Illinois Production Cost Report</a>)</li>
+</ul>
+</div>
+<h2>Sources</h2>
+<ul>
+<li><a href="https://www.ams.usda.gov/mnreports/ams_2863.pdf">USDA AMS Iowa Production Cost Report</a>, report dated Oct 30, 2026</li>
+<li><a href="https://www.ams.usda.gov/mnreports/ams_3195.pdf">USDA AMS Illinois Production Cost Report</a>, report dated Oct 30, 2026</li>
+</ul>
+<p class="note">Data, not advice. This is math on numbers: the published prices are government averages and the rates are yours. It does not suggest a rate or a product. What you type stays in your browser; this page sends nothing anywhere.</p>
+<script type="application/json" id="ws-data">{"IA": [{"item": "anhydrous", "name": "Anhydrous ammonia", "price": 902.33, "unit": "$/ton", "rate_unit": "lb/acre", "as_of": "2026-10-30", "as_of_text": "Oct 30, 2026", "source_name": "USDA AMS Iowa Production Cost Report", "source_url": "https://www.ams.usda.gov/mnreports/ams_2863.pdf"}, {"item": "uan32", "name": "UAN 32%", "price": 510.0, "unit": "$/ton", "rate_unit": "lb/acre", "as_of": "2026-10-30", "as_of_text": "Oct 30, 2026", "source_name": "USDA AMS Iowa Production Cost Report", "source_url": "https://www.ams.usda.gov/mnreports/ams_2863.pdf"}, {"item": "map", "name": "MAP", "price": 976.0, "unit": "$/ton", "rate_unit": "lb/acre", "as_of": "2026-10-30", "as_of_text": "Oct 30, 2026", "source_name": "USDA AMS Iowa Production Cost Report", "source_url": "https://www.ams.usda.gov/mnreports/ams_2863.pdf"}, {"item": "potash", "name": "Potash", "price": 499.8, "unit": "$/ton", "rate_unit": "lb/acre", "as_of": "2026-10-30", "as_of_text": "Oct 30, 2026", "source_name": "USDA AMS Iowa Production Cost Report", "source_url": "https://www.ams.usda.gov/mnreports/ams_2863.pdf"}, {"item": "diesel", "name": "Farm diesel", "price": 5.65, "unit": "$/gal", "rate_unit": "gal/acre", "as_of": "2026-10-30", "as_of_text": "Oct 30, 2026", "source_name": "USDA AMS Iowa Production Cost Report", "source_url": "https://www.ams.usda.gov/mnreports/ams_2863.pdf"}], "IL": [{"item": "anhydrous", "name": "Anhydrous ammonia", "price": 981.11, "unit": "$/ton", "rate_unit": "lb/acre", "as_of": "2026-10-30", "as_of_text": "Oct 30, 2026", "source_name": "USDA AMS Illinois Production Cost Report", "source_url": "https://www.ams.usda.gov/mnreports/ams_3195.pdf"}, {"item": "urea", "name": "Urea", "price": 770.0, "unit": "$/ton", "rate_unit": "lb/acre", "as_of": "2026-10-30", "as_of_text": "Oct 30, 2026", "source_name": "USDA AMS Illinois Production Cost Report", "source_url": "https://www.ams.usda.gov/mnreports/ams_3195.pdf"}, {"item": "uan28", "name": "UAN 28%", "price": 467.86, "unit": "$/ton", "rate_unit": "lb/acre", "as_of": "2026-10-30", "as_of_text": "Oct 30, 2026", "source_name": "USDA AMS Illinois Production Cost Report", "source_url": "https://www.ams.usda.gov/mnreports/ams_3195.pdf"}, {"item": "uan32", "name": "UAN 32%", "price": 540.0, "unit": "$/ton", "rate_unit": "lb/acre", "as_of": "2026-10-30", "as_of_text": "Oct 30, 2026", "source_name": "USDA AMS Illinois Production Cost Report", "source_url": "https://www.ams.usda.gov/mnreports/ams_3195.pdf"}, {"item": "dap", "name": "DAP", "price": 932.14, "unit": "$/ton", "rate_unit": "lb/acre", "as_of": "2026-10-30", "as_of_text": "Oct 30, 2026", "source_name": "USDA AMS Illinois Production Cost Report", "source_url": "https://www.ams.usda.gov/mnreports/ams_3195.pdf"}, {"item": "map", "name": "MAP", "price": 948.0, "unit": "$/ton", "rate_unit": "lb/acre", "as_of": "2026-10-30", "as_of_text": "Oct 30, 2026", "source_name": "USDA AMS Illinois Production Cost Report", "source_url": "https://www.ams.usda.gov/mnreports/ams_3195.pdf"}, {"item": "potash", "name": "Potash", "price": 517.73, "unit": "$/ton", "rate_unit": "lb/acre", "as_of": "2026-10-30", "as_of_text": "Oct 30, 2026", "source_name": "USDA AMS Illinois Production Cost Report", "source_url": "https://www.ams.usda.gov/mnreports/ams_3195.pdf"}, {"item": "diesel", "name": "Farm diesel", "price": 5.71, "unit": "$/gal", "rate_unit": "gal/acre", "as_of": "2026-10-30", "as_of_text": "Oct 30, 2026", "source_name": "USDA AMS Illinois Production Cost Report", "source_url": "https://www.ams.usda.gov/mnreports/ams_3195.pdf"}]}</script>
+<script>
+function lineCost(price, unit, rate) {
+  if (unit === "$/ton") return price * rate / 2000;
+  if (unit === "$/gal") return price * rate;
+  return NaN;
+}
+function money(v) {
+  return "$" + v.toFixed(2).replace(/\B(?=(\d{3})+(?!\d))/g, ",");
+}
+
+(function () {
+  var data = JSON.parse(document.getElementById("ws-data").textContent);
+  var pick = document.getElementById("ws-state");
+  var body = document.getElementById("ws-body");
+  var total = document.getElementById("ws-total");
+  function num(el) {
+    var t = el.value.trim();
+    if (t === "") return null;
+    var v = Number(t);
+    return (isFinite(v) && v >= 0) ? v : NaN;
+  }
+  function cell(row, label) {
+    var td = row.insertCell();
+    td.setAttribute("data-label", label);
+    return td;
+  }
+  function draw() {
+    body.innerHTML = "";
+    data[pick.value].forEach(function (p) {
+      var tr = body.insertRow();
+      cell(tr, "Product").textContent = p.name;
+      var pub = cell(tr, "Published price");
+      pub.appendChild(document.createTextNode(money(p.price) + "/" + p.unit.slice(2) + ", " + p.as_of_text + " "));
+      var a = document.createElement("a");
+      a.href = p.source_url; a.textContent = "(source)"; a.title = p.source_name;
+      pub.appendChild(a);
+      var r = document.createElement("input");
+      r.type = "number"; r.min = "0"; r.step = "any"; r.inputMode = "decimal";
+      r.setAttribute("aria-label", "Your rate for " + p.name + " (" + p.rate_unit + ")");
+      r.className = "rate";
+      var rc = cell(tr, "Your rate (" + p.rate_unit + ")");
+      rc.appendChild(r);
+      var q = document.createElement("input");
+      q.type = "number"; q.min = "0"; q.step = "any"; q.inputMode = "decimal";
+      q.setAttribute("aria-label", "Your own quote for " + p.name + " (" + p.unit + "), optional");
+      q.className = "quote";
+      cell(tr, "Your quote (" + p.unit + ", optional)").appendChild(q);
+      var out = cell(tr, "$/acre");
+      out.className = "cost";
+      r.oninput = q.oninput = sum;
+      tr._p = p; tr._r = r; tr._q = q; tr._out = out;
+    });
+    sum();
+  }
+  function sum() {
+    var t = 0, n = 0, bad = false;
+    Array.prototype.forEach.call(body.rows, function (tr) {
+      var rate = num(tr._r), quote = num(tr._q);
+      if (rate === null) { tr._out.textContent = ""; return; }
+      if (isNaN(rate) || isNaN(quote)) { tr._out.textContent = "check number"; bad = true; return; }
+      var price = (quote !== null && quote > 0) ? quote : tr._p.price;
+      var c = lineCost(price, tr._p.unit, rate);
+      t += c; n += 1;
+      tr._out.textContent = money(c) + ((quote !== null && quote > 0) ? " (your quote)" : "");
+    });
+    total.textContent = n ? money(t) + " per acre (" + n + " product" + (n > 1 ? "s" : "") + ")" + (bad ? ", some lines skipped" : "")
+                          : "Type a rate to see your cost per acre.";
+  }
+  pick.onchange = draw;
+  document.getElementById("ws-js").hidden = false;
+  document.getElementById("ws-nojs").hidden = true;
+  draw();
+})();
+</script>
+</body>
+</html>
