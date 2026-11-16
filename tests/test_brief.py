@@ -102,6 +102,22 @@ def test_sources_list_is_unique_with_newest_date():
     assert all(s["as_of"] == date(2026, 10, 30) for s in srcs)
 
 
+def test_same_agency_with_two_links_says_which_items_each_covers():
+    eia = "U.S. Energy Information Administration (EIA)"
+    diesel_url = "https://www.eia.gov/diesel"
+    propane_url = "https://www.eia.gov/propane"
+    srcs = brief.sources(changes.compute([
+        row("onhwy_diesel", 6.40, DAY, "PADD2", eia, diesel_url, "$/gal"),
+        row("res_propane", 2.30, DAY, "PADD2", eia, propane_url, "$/gal"),
+        row("anhydrous", 900.0, date(2026, 10, 30)),
+    ]))
+    names = {s["url"]: s["name"] for s in srcs}
+    assert names[diesel_url] == eia + ": on-highway diesel (retail)"
+    assert names[propane_url] == eia + ": residential propane"
+    assert names[IA_URL] == IA           # only one link: name unchanged
+    assert "EIA" in brief.credit_line(srcs)
+
+
 def test_html_escapes_and_links():
     results = changes.compute([row("potash", 500.0, date(2026, 10, 30),
                                    source="A <b>bad</b> & name", url=IA_URL + "?a=1&b=2")])

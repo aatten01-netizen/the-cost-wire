@@ -2,6 +2,12 @@
 
 Newest first.
 
+## 2026-11-16 — QA (the-cost-wire, 5:43 AM run)
+**Checked:** all 266 tests pass, pyflakes clean. Rebuilt the site in a scratch copy (no unexpected changes) and opened all 15 pages (home, archive, 3 briefs, cash rent, alerts, pricing, pro sample, worksheet, 5 state pages) in Chromium at phone width (375px): no page errors, no broken local links, no sideways scroll, disclaimer on every page.
+**Found:** the Sources list in the brief (and every state edition) showed "U.S. Energy Information Administration (EIA)" twice with two different links (one is the diesel page, one is the propane page). A reader couldn't tell which link backs which number.
+**Fixed:** `src/costwire/brief.py` `sources()`: when one agency has more than one link, each line now says what it covers, e.g. "U.S. Energy Information Administration (EIA): on-highway diesel (retail)" and "...: residential propane". Sources with one link are unchanged. Rebuilt the Nov 9 brief, home page and state editions (only those 2 source lines changed; the older archive briefs were left as published). Accuracy check passes. 1 new test, 267 pass, 1 skipped.
+**Verify:** `PYTHONPATH=src python3 -m pytest -q tests/test_brief.py`; open `site/index.html` and scroll to "Sources".
+
 ## 2026-11-16 — Step 22: State choice on the free signup (night shift)
 **Why this step:** every PLAN step was done. The state editions (Step 21) exist, but nobody can tell us their state, so we could never email a reader their own state's brief. A state on the signup is the first piece of that Pro feature, so I added it as Step 22 (money rule).
 **Built:** the free signup box now has an optional "Your state" dropdown (Iowa, Illinois, Minnesota, Wisconsin, Other / skip; nothing picked by default). On the "coming soon" box it is disabled like the rest; on the live box it posts a `state` field. `docs/signup-google-sheet.md` has the updated Apps Script (saves a 6th column, `state`, only if it is IA/IL/MN/WI). New `src/costwire/state_list.py`: `python -m costwire.state_list signups.csv readers.csv` turns the downloaded Sheet into `email,state`, one row per reader (newest signup wins; a later alert-only row doesn't wipe their state; bad emails skipped; works with an old Sheet that has no state column; refuses to write inside the repo; prints readers per state). Nothing is emailed. 8 new tests, 266 pass, 1 skipped. Site rebuilt (only the dropdown + one CSS line changed), accuracy check passes, live-mode form checked at 375px in Chromium: no sideways scroll, no errors.

@@ -171,13 +171,29 @@ def what_changed(r: dict) -> str:
 
 
 def sources(results: list[dict]) -> list[dict]:
-    """Unique sources with the newest date we used from each."""
+    """Unique sources with the newest date we used from each.
+
+    When one agency has more than one link (EIA has one page for diesel and
+    another for propane), the name also says which items that link covers,
+    so a reader can tell the links apart."""
     found = {}
+    items = {}
     for r in results:
         key = (r["source_name"], r["source_url"])
         if key not in found or r["as_of"] > found[key]:
             found[key] = r["as_of"]
-    return [{"name": n, "url": u, "as_of": d} for (n, u), d in sorted(found.items())]
+        name = item_name(r["item"])
+        name = name[:1].lower() + name[1:]
+        if name not in items.setdefault(key, []):
+            items[key].append(name)
+    link_count = {}
+    for n, _ in found:
+        link_count[n] = link_count.get(n, 0) + 1
+    out = []
+    for (n, u), d in sorted(found.items()):
+        label = f"{n}: {', '.join(items[(n, u)])}" if link_count[n] > 1 else n
+        out.append({"name": label, "url": u, "as_of": d})
+    return out
 
 
 def credit_line(srcs: list[dict], nass: bool = False) -> str:
