@@ -39,3 +39,4 @@ Free weekly brief (web + email). Later paid tier (~$9-15/month per BRIEF.md): yo
 - [x] 17. "Cost per pound of N" share posts: brief P.S., Facebook, forum reply (marketing/n-cost-share-posts.md)
 - [x] 18. Cost-per-acre worksheet share posts: brief P.S., Facebook, forum reply, Commodity Wire line (marketing/worksheet-share-posts.md)
 - [x] 19. "Your state's brief" share posts: brief P.S., Facebook (IA/IL), forum reply, Commodity Wire line (marketing/state-edition-share-posts.md)
+- [x] 20. Welcome email for new signups, with the "which state?" question (marketing/welcome-email.md)

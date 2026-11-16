@@ -26,7 +26,7 @@ ul.trends li { margin-bottom: 0.8rem; }
 .sitenav a { color: #222; }
 .sitenav .brand { font-weight: bold; margin-right: auto; text-decoration: none; }
 .signup { margin-top: 2rem; padding: 1rem; border: 1px solid #ddd; background: #f8f8f4; }
-.signup input { padding: 0.4rem; max-width: 100%; }
+.signup input, .signup select { padding: 0.4rem; max-width: 100%; font: inherit; }
 </style>
 <link rel="alternate" type="application/rss+xml" title="The Cost Wire" href="feed.xml">
 </head>
@@ -110,6 +110,14 @@ ul.trends li { margin-bottom: 0.8rem; }
 <p>A short email every Monday with fertilizer, fuel and feed prices and what changed.</p>
 <form onsubmit="return false;">
 <input type="email" placeholder="you@example.com" aria-label="Email address" disabled>
+<select aria-label="Your state (optional)" disabled>
+<option value="">Your state (optional)</option>
+<option value="IA">Iowa</option>
+<option value="IL">Illinois</option>
+<option value="MN">Minnesota</option>
+<option value="WI">Wisconsin</option>
+<option value="">Other / skip</option>
+</select>
 <button type="button" disabled>Sign up (coming soon)</button>
 </form>
 <p class="note">Signup is not open yet. Nothing you type here is saved or sent.</p>

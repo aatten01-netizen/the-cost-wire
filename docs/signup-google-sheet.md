@@ -2,7 +2,8 @@
 
 One Sheet holds both the free brief signups and the price-alert choices.
 
-1. Make a new Google Sheet called "Cost Wire signups". Row 1: `time`, `email`, `alert_item`, `alert_region`, `alert_threshold`.
+1. Make a new Google Sheet called "Cost Wire signups". Row 1: `time`, `email`, `alert_item`, `alert_region`, `alert_threshold`, `state`.
+   (Already made the sheet? Just type `state` in cell F1.)
 2. In the sheet: Extensions > Apps Script. Replace the code with:
 
 ```js
@@ -13,13 +14,15 @@ function doPost(e) {
   if (!/^[^@\s,]+@[^@\s,]+\.[^@\s,]+$/.test(email)) {
     return HtmlService.createHtmlOutput("<p style='font-family:Georgia'>That email didn't look right. <a href='javascript:history.back()'>Back</a></p>");
   }
-  // Alert choice (from alerts.html) is optional; the free signup sends only email.
+  // Alert choice (from alerts.html) is optional; the free signup sends email + state.
   var pick = (p.alert_pick || "").split("|");
   var item = /^[a-z0-9_]{1,20}$/.test(pick[0] || "") ? pick[0] : "";
   var region = /^[A-Z0-9]{2,6}$/.test(pick[1] || "") ? pick[1] : "";
   var amount = /^[0-9]{1,4}$/.test(p.alert_threshold || "") ? p.alert_threshold : "";
   if (!(item && region && amount)) { item = ""; region = ""; amount = ""; }
-  SpreadsheetApp.getActiveSheet().appendRow([new Date(), email, item, region, amount]);
+  // State choice (from the free signup) is optional: IA, IL, MN or WI, else blank.
+  var state = /^(IA|IL|MN|WI)$/.test(p.state || "") ? p.state : "";
+  SpreadsheetApp.getActiveSheet().appendRow([new Date(), email, item, region, amount, state]);
   var msg = item ? "Thanks! Your alert is saved and you are on the Monday list." : "Thanks! You are on the list.";
   return HtmlService.createHtmlOutput("<p style='font-family:Georgia'>" + msg + " <a href='javascript:history.back()'>Back</a></p>");
 }
@@ -35,5 +38,11 @@ function doPost(e) {
 2. Run: `PYTHONPATH=src python -m costwire.alert_signup ~/Downloads/signups.csv ~/costwire-private/alerts.csv`
    It keeps only rows with a valid alert choice for an item and state we publish (newest choice wins per reader + item + state) and refuses to write inside the repo.
 3. Use that file as `ALERTS_FILE` for `python -m costwire.alerts` (mock sender for now; no real email).
+
+## Turning the Sheet into the per-state reader list
+1. Download the Sheet as CSV OUTSIDE the repo (same as above).
+2. Run: `PYTHONPATH=src python -m costwire.state_list ~/Downloads/signups.csv ~/costwire-private/readers.csv`
+   It writes `email,state`, one row per reader (newest signup wins; a later alert-only row keeps their state). Blank state = the main brief. It prints how many readers picked each state and refuses to write inside the repo.
+3. Nothing is emailed yet. This list is for a later step that sends each reader their state edition.
 
 Later, copy the sheet's emails into Resend as an audience for sending.

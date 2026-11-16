@@ -29,30 +29,39 @@ import sys
 from datetime import date
 
 from . import (alert_signup, changes, corn_price, feed_rss, nass_land, pricing, pro_sample,
-               rentpage, state_brief, worksheet)
+               rentpage, state_brief, state_list, worksheet)
 from .paths import BRIEFS_DIR, SITE_DIR
 
 BRIEF_NAME = re.compile(r"^(\d{4}-\d{2}-\d{2})\.html$")
 
-SIGNUP_BOX = """<section class="signup" id="signup">
+SIGNUP_TEMPLATE = """<section class="signup" id="signup">
 <h2>Get the brief by email</h2>
 <p>A short email every Monday with fertilizer, fuel and feed prices and what changed.</p>
 <form onsubmit="return false;">
 <input type="email" placeholder="you@example.com" aria-label="Email address" disabled>
+<select aria-label="Your state (optional)" disabled>
+{state_options}
+</select>
 <button type="button" disabled>Sign up (coming soon)</button>
 </form>
 <p class="note">Signup is not open yet. Nothing you type here is saved or sent.</p>
 </section>"""
+
+# The state list never changes at run time, so the placeholder is filled in once.
+SIGNUP_BOX = SIGNUP_TEMPLATE.format(state_options=state_list.options_html())
 
 LIVE_SIGNUP_BOX = """<section class="signup" id="signup">
 <h2>Get the brief by email</h2>
 <p>A short email every Monday with fertilizer, fuel and feed prices and what changed.</p>
 <form method="post" action="{action}">
 <input type="email" name="email" placeholder="you@example.com" aria-label="Email address" required>
+<select name="state" aria-label="Your state (optional)">
+{state_options}
+</select>
 <input type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true" style="position:absolute;left:-9999px">
 <button type="submit">Sign up</button>
 </form>
-<p class="note">One email a week. We store only your email address. Data, not advice.</p>
+<p class="note">One email a week. We store only your email address and the state you pick (optional, so we can later send your state's edition). Data, not advice.</p>
 </section>"""
 
 
@@ -61,8 +70,9 @@ def signup_box(env=None) -> str:
     env = os.environ if env is None else env
     url = (env.get("SIGNUP_FORM_URL") or "").strip()
     live = (env.get("SIGNUP_LIVE") or "").strip().lower() == "yes"
+    options = state_list.options_html()
     if live and url.startswith("https://"):
-        return LIVE_SIGNUP_BOX.format(action=html.escape(url, quote=True))
+        return LIVE_SIGNUP_BOX.format(action=html.escape(url, quote=True), state_options=options)
     return SIGNUP_BOX
 
 
@@ -71,7 +81,7 @@ SITE_CSS = """
 .sitenav a { color: #222; }
 .sitenav .brand { font-weight: bold; margin-right: auto; text-decoration: none; }
 .signup { margin-top: 2rem; padding: 1rem; border: 1px solid #ddd; background: #f8f8f4; }
-.signup input { padding: 0.4rem; max-width: 100%; }
+.signup input, .signup select { padding: 0.4rem; max-width: 100%; font: inherit; }
 """
 
 
