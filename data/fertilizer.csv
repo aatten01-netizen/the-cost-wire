@@ -19,3 +19,23 @@ ddgs,175.0,$/ton,2026-11-02,USDA AMS National Weekly Grain Co-Products Report,ht
 onhwy_diesel,6.402,$/gal,2026-11-02,U.S. Energy Information Administration (EIA),https://www.eia.gov/dnav/pet/hist/LeafHandler.ashx?n=PET&s=EMD_EPD2D_PTE_R20_DPG&f=W,PADD2
 res_propane,2.298,$/gal,2026-11-02,U.S. Energy Information Administration (EIA),https://www.eia.gov/dnav/pet/hist/LeafHandler.ashx?n=PET&s=W_EPLLPA_PRS_R20_DPG&f=W,PADD2
 ddgs,174.0,$/ton,2026-11-02,USDA AMS National Weekly Grain Co-Products Report,https://www.ams.usda.gov/mnreports/ams_3618.pdf,WI
+onhwy_diesel,6.201,$/gal,2026-11-09,U.S. Energy Information Administration (EIA),https://www.eia.gov/dnav/pet/hist/LeafHandler.ashx?n=PET&s=EMD_EPD2D_PTE_R20_DPG&f=W,PADD2
+res_propane,2.311,$/gal,2026-11-09,U.S. Energy Information Administration (EIA),https://www.eia.gov/dnav/pet/hist/LeafHandler.ashx?n=PET&s=W_EPLLPA_PRS_R20_DPG&f=W,PADD2
+anhydrous,941.75,$/ton,2026-11-13,USDA AMS Iowa Production Cost Report,https://www.ams.usda.gov/mnreports/ams_2863.pdf,IA
+diesel,5.28,$/gal,2026-11-13,USDA AMS Iowa Production Cost Report,https://www.ams.usda.gov/mnreports/ams_2863.pdf,IA
+map,984.0,$/ton,2026-11-13,USDA AMS Iowa Production Cost Report,https://www.ams.usda.gov/mnreports/ams_2863.pdf,IA
+potash,507.8,$/ton,2026-11-13,USDA AMS Iowa Production Cost Report,https://www.ams.usda.gov/mnreports/ams_2863.pdf,IA
+propane,1.83,$/gal,2026-11-13,USDA AMS Iowa Production Cost Report,https://www.ams.usda.gov/mnreports/ams_2863.pdf,IA
+uan32,510.0,$/ton,2026-11-13,USDA AMS Iowa Production Cost Report,https://www.ams.usda.gov/mnreports/ams_2863.pdf,IA
+anhydrous,981.11,$/ton,2026-11-13,USDA AMS Illinois Production Cost Report,https://www.ams.usda.gov/mnreports/ams_3195.pdf,IL
+dap,932.14,$/ton,2026-11-13,USDA AMS Illinois Production Cost Report,https://www.ams.usda.gov/mnreports/ams_3195.pdf,IL
+diesel,5.07,$/gal,2026-11-13,USDA AMS Illinois Production Cost Report,https://www.ams.usda.gov/mnreports/ams_3195.pdf,IL
+map,948.0,$/ton,2026-11-13,USDA AMS Illinois Production Cost Report,https://www.ams.usda.gov/mnreports/ams_3195.pdf,IL
+potash,517.73,$/ton,2026-11-13,USDA AMS Illinois Production Cost Report,https://www.ams.usda.gov/mnreports/ams_3195.pdf,IL
+uan28,467.86,$/ton,2026-11-13,USDA AMS Illinois Production Cost Report,https://www.ams.usda.gov/mnreports/ams_3195.pdf,IL
+uan32,540.0,$/ton,2026-11-13,USDA AMS Illinois Production Cost Report,https://www.ams.usda.gov/mnreports/ams_3195.pdf,IL
+urea,770.0,$/ton,2026-11-13,USDA AMS Illinois Production Cost Report,https://www.ams.usda.gov/mnreports/ams_3195.pdf,IL
+ddgs,165.19,$/ton,2026-11-16,USDA AMS National Weekly Grain Co-Products Report,https://www.ams.usda.gov/mnreports/ams_3618.pdf,IA
+ddgs,201.0,$/ton,2026-11-16,USDA AMS National Weekly Grain Co-Products Report,https://www.ams.usda.gov/mnreports/ams_3618.pdf,IL
+ddgs,166.25,$/ton,2026-11-16,USDA AMS National Weekly Grain Co-Products Report,https://www.ams.usda.gov/mnreports/ams_3618.pdf,MN
+ddgs,169.5,$/ton,2026-11-16,USDA AMS National Weekly Grain Co-Products Report,https://www.ams.usda.gov/mnreports/ams_3618.pdf,WI
