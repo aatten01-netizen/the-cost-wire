@@ -41,3 +41,4 @@ One step per weekly build session. Do the first unchecked step, then check it of
 
 ## Added by build bot (Nov 16)
 - [x] 22. State choice on the free signup: optional "Your state" dropdown (IA, IL, MN, WI, Other/skip) on the signup box, posted as `state` to the same Google Sheet (Apps Script + doc updated); `python -m costwire.state_list sheet.csv readers.csv` writes `email,state` (newest signup wins, alert-only rows keep the state, refuses to write inside the repo), ready for a later state-edition send. Tests.
+- [x] 23. Email each reader their state edition: `python -m costwire.state_email` reads `READERS_FILE` (from Step 22), groups readers by edition (IA/IL/MN/WI, or the main brief when no state or no published prices), builds each edition with the accuracy check. Dry run by default; with `STATE_EMAIL_LIVE=yes` + Resend key it sends ONE test email per edition to `BRIEF_TEST_EMAIL` only (max 5), never to readers. Tests.

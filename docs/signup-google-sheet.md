@@ -43,6 +43,7 @@ function doPost(e) {
 1. Download the Sheet as CSV OUTSIDE the repo (same as above).
 2. Run: `PYTHONPATH=src python -m costwire.state_list ~/Downloads/signups.csv ~/costwire-private/readers.csv`
    It writes `email,state`, one row per reader (newest signup wins; a later alert-only row keeps their state). Blank state = the main brief. It prints how many readers picked each state and refuses to write inside the repo.
-3. Nothing is emailed yet. This list is for a later step that sends each reader their state edition.
+3. Check who would get which edition (dry run, sends nothing): `READERS_FILE=~/costwire-private/readers.csv PYTHONPATH=src python -m costwire.state_email`
+4. To see each edition in your own inbox: add `STATE_EMAIL_LIVE=yes RESEND_API_KEY=... BRIEF_TEST_EMAIL=you@example.com`. It sends ONE test email per edition to that address only (max 5). Readers are never emailed by this.
 
 Later, copy the sheet's emails into Resend as an audience for sending.

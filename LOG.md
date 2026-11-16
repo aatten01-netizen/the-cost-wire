@@ -2,6 +2,14 @@
 
 Newest first.
 
+## 2026-11-16 — Step 23: Email each reader their state edition (test address only)
+**Why this step:** every PLAN step was done. Step 22 lets readers pick a state, but nothing used that choice. Turning it into the email each reader gets is the delivery side of the "your state's brief" Pro feature, so it makes Pro sellable sooner (money rule). Added as Step 23.
+**Built:** `src/costwire/state_email.py`. `python -m costwire.state_email` reads `READERS_FILE` (the `email,state` file from Step 22, kept outside the repo), groups readers: Iowa/Illinois/Minnesota/Wisconsin readers get their state edition (same builder and accuracy check as the site's state pages); readers with no state, or a state with no published prices, get the main brief. **Default is a dry run**: it prints how many readers would get each edition and sends nothing. Only with `STATE_EMAIL_LIVE=yes` + `RESEND_API_KEY` + `BRIEF_TEST_EMAIL` does it send real email, and then just ONE test email per edition (max 5) to Andy's test address, with a note saying how many readers it would go to and that none were emailed. Reader emails are never printed or put in the email. `.env.example` and `docs/signup-google-sheet.md` updated. 9 new tests (Resend never called), 277 pass. Dry run on the real data with a 4-reader scratch file: Iowa, Illinois and Minnesota editions + main brief, 1 each, nothing sent.
+**Try it:** `PYTHONPATH=src python3 -m pytest -q tests/test_state_email.py`; make `readers.csv` outside the repo (`email,state` + `you@example.com,IA`), then `READERS_FILE=/path/readers.csv PYTHONPATH=src python3 -m costwire.state_email`.
+**Andy:** optional: (1) add `STATE_EMAIL_LIVE=yes RESEND_API_KEY=... BRIEF_TEST_EMAIL=you@example.com` to the command above to see each state edition in your inbox. Biggest blocker to a first dollar is still turning on the signup form (docs/signup-google-sheet.md); there are no readers to send to until then.
+Marketing: "Your state's edition is here" launch note: email intro, Facebook post, forum reply (marketing/state-edition-email-launch.md) - Andy: reply SEND/POST in chat to have it sent
+**Next:** sending to real readers stays off until Andy says so. Next code step needs a new PLAN step (e.g. a one-click "switch to full brief / change state" reply handler) or a market scan.
+
 ## 2026-11-16 — QA (the-cost-wire, 5:43 AM run)
 **Checked:** all 266 tests pass, pyflakes clean. Rebuilt the site in a scratch copy (no unexpected changes) and opened all 15 pages (home, archive, 3 briefs, cash rent, alerts, pricing, pro sample, worksheet, 5 state pages) in Chromium at phone width (375px): no page errors, no broken local links, no sideways scroll, disclaimer on every page.
 **Found:** the Sources list in the brief (and every state edition) showed "U.S. Energy Information Administration (EIA)" twice with two different links (one is the diesel page, one is the propane page). A reader couldn't tell which link backs which number.
