@@ -21,7 +21,7 @@ def test_message_shape(tmp_path):
     m = email_brief.build_message("2026-11-02", "a@b.com", briefs_dir=make(tmp_path))
     assert m["to"] == ["a@b.com"]
     assert m["subject"].startswith("[TEST]")
-    assert "brief 2026-11-02" in m["html"] and m["text"] == "brief 2026-11-02"
+    assert "brief 2026-11-02" in m["html"] and m["text"].startswith("brief 2026-11-02\n\n--")
 
 
 def test_sends_latest_with_key(tmp_path):

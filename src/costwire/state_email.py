@@ -29,7 +29,7 @@ import os
 import sys
 from pathlib import Path
 
-from . import brief, changes, corn_price, state_brief
+from . import brief, changes, corn_price, state_brief, unsubscribe
 from .email_brief import DEFAULT_FROM, RESEND_URL, latest_brief_date
 from .feed_rss import site_url
 from .paths import BRIEFS_DIR
@@ -88,18 +88,24 @@ def build_editions(rows, brief_date, corn_prices=None, briefs_dir=BRIEFS_DIR) ->
     return out
 
 
-def test_message(edition_key, ed, n_readers, brief_date, test_to, sender=DEFAULT_FROM) -> dict:
-    """The Resend payload for one edition, addressed ONLY to the test address."""
+def test_message(edition_key, ed, n_readers, brief_date, test_to, sender=DEFAULT_FROM,
+                 env=None) -> dict:
+    """The Resend payload for one edition, addressed ONLY to the test address.
+    Carries the unsubscribe + mailing-address footer (Step 24)."""
     who = "no state picked" if edition_key == MAIN else brief.region_name(edition_key)
     note = (f"(Test send. This edition would go to {n_readers} reader(s) ({who}); "
             f"none of them were emailed. Web version: {ed['web']})")
-    return {
+    msg = {
         "from": sender,
         "to": [test_to],  # ALWAYS the test address, never a reader
         "subject": f"[TEST x{n_readers}] {ed['title']} — week of {brief_date.isoformat()}",
-        "html": f'<p style="font-family:sans-serif;color:#555">{note}</p>\n' + ed["html"],
-        "text": f"{note}\n\n{ed['text']}",
+        "html": unsubscribe.add_footer_html(
+            f'<p style="font-family:sans-serif;color:#555">{note}</p>\n' + ed["html"], env),
+        "text": f"{note}\n\n{ed['text'].rstrip()}\n\n{unsubscribe.footer_text(env)}",
     }
+    if unsubscribe.headers(env):
+        msg["headers"] = unsubscribe.headers(env)
+    return msg
 
 
 def plan(readers, editions) -> list[tuple]:
@@ -128,7 +134,7 @@ def run(readers, editions, brief_date, env=None, post=None) -> dict:
         if post is None:
             from .email_brief import _post as post
         for k, n in todo[:MAX_TEST_SENDS]:
-            msg = test_message(k, editions[k], n, brief_date, test_to)
+            msg = test_message(k, editions[k], n, brief_date, test_to, env=env)
             post(RESEND_URL, {"Authorization": f"Bearer {key}"}, msg)
             sent.append(msg["subject"])
     return {"plan": todo, "sent": sent, "live": live}
@@ -146,7 +152,8 @@ def main(argv=None) -> int:
     from datetime import date
     brief_date = date.fromisoformat(newest)
     try:
-        readers = load_readers(path)
+        # Readers who unsubscribed are dropped before anything else (Step 24).
+        readers = unsubscribe.drop(load_readers(path), unsubscribe.load_from_env())
         rows = changes.read_rows()
         editions = build_editions(rows, brief_date, corn_price.load_prices())
         result = run(readers, editions, brief_date)

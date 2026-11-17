@@ -18,6 +18,7 @@ import os
 import re
 import sys
 
+from . import unsubscribe
 from .paths import BRIEFS_DIR
 
 RESEND_URL = "https://api.resend.com/emails"
@@ -32,8 +33,9 @@ def latest_brief_date(briefs_dir=BRIEFS_DIR):
     return dates[-1] if dates else None
 
 
-def build_message(brief_date, to, sender=DEFAULT_FROM, briefs_dir=BRIEFS_DIR):
-    """The Resend payload: HTML body plus the Markdown as plain text."""
+def build_message(brief_date, to, sender=DEFAULT_FROM, briefs_dir=BRIEFS_DIR, env=None):
+    """The Resend payload: HTML body plus the Markdown as plain text, both with
+    the unsubscribe + mailing-address footer (Step 24)."""
     html_path = briefs_dir / f"{brief_date}.html"
     md_path = briefs_dir / f"{brief_date}.md"
     if not html_path.exists():
@@ -42,10 +44,12 @@ def build_message(brief_date, to, sender=DEFAULT_FROM, briefs_dir=BRIEFS_DIR):
         "from": sender,
         "to": [to],
         "subject": f"[TEST] The Cost Wire — week of {brief_date}",
-        "html": html_path.read_text(encoding="utf-8"),
+        "html": unsubscribe.add_footer_html(html_path.read_text(encoding="utf-8"), env),
     }
-    if md_path.exists():
-        msg["text"] = md_path.read_text(encoding="utf-8")
+    text = md_path.read_text(encoding="utf-8") if md_path.exists() else ""
+    msg["text"] = (text.rstrip() + "\n\n" if text else "") + unsubscribe.footer_text(env)
+    if unsubscribe.headers(env):
+        msg["headers"] = unsubscribe.headers(env)
     return msg
 
 

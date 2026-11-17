@@ -29,7 +29,7 @@ import sys
 from datetime import date, timedelta
 from pathlib import Path
 
-from . import changes
+from . import changes, unsubscribe
 from .brief import item_in_sentence, region_name
 
 MAX_GAP_DAYS = 45  # previous report must be this recent, or no alert
@@ -175,7 +175,7 @@ class ResendSender:
     live = True
 
     def __init__(self, api_key: str, test_to: str, post=None, sender=DEFAULT_FROM,
-                 max_sends=MAX_TEST_SENDS):
+                 max_sends=MAX_TEST_SENDS, env=None):
         if not api_key:
             raise ValueError("RESEND_API_KEY is missing.")
         self.api_key = api_key
@@ -185,6 +185,7 @@ class ResendSender:
         if post is None:
             from .email_brief import _post as post
         self.post = post
+        self.env = env
         self.sent = []
 
     def send(self, to: str, subject: str, body: str) -> None:
@@ -195,8 +196,11 @@ class ResendSender:
             "from": self.sender,
             "to": [self.test_to],  # ALWAYS the test address, never the reader
             "subject": f"[TEST for {to}] {subject}",
-            "text": f"(Test alert. Meant for reader {to}; they were NOT emailed.)\n\n{body}",
+            "text": (f"(Test alert. Meant for reader {to}; they were NOT emailed.)\n\n{body}"
+                     f"\n\n{unsubscribe.footer_text(self.env)}"),
         }
+        if unsubscribe.headers(self.env):
+            payload["headers"] = unsubscribe.headers(self.env)
         self.post(RESEND_URL, {"Authorization": f"Bearer {self.api_key}"}, payload)
         self.sent.append({"to": self.test_to, "subject": payload["subject"], "body": payload["text"]})
 
@@ -211,12 +215,13 @@ def pick_sender(env=None, post=None):
     if not key or not test_to:
         print("ALERTS_LIVE=yes but RESEND_API_KEY or BRIEF_TEST_EMAIL is missing: using the mock sender.")
         return MockSender()
-    return ResendSender(key, test_to, post=post)
+    return ResendSender(key, test_to, post=post, env=env)
 
 
-def run(alerts_file, sent_file, rows, sender) -> int:
-    """Find alerts, hand them to `sender`, remember them. Returns how many."""
-    subs = load_subscriptions(alerts_file)
+def run(alerts_file, sent_file, rows, sender, unsubscribed=frozenset()) -> int:
+    """Find alerts, hand them to `sender`, remember them. Returns how many.
+    Readers on the unsubscribe list (Step 24) never get an alert."""
+    subs = unsubscribe.drop(load_subscriptions(alerts_file), set(unsubscribed))
     already = _sent_keys(sent_file)
     alerts = find_alerts(subs, rows, already)
     done = []
@@ -249,7 +254,8 @@ def main(argv=None) -> int:
         # sent, or the real test send later would skip them.
         sent_file = str(Path(sent_file).with_name("alerts_sent_mock.csv"))
     try:
-        n = run(alerts_file, sent_file, changes.read_rows(), sender)
+        n = run(alerts_file, sent_file, changes.read_rows(), sender,
+                unsubscribe.load_from_env())
     except Exception as e:  # never print the key; error type only
         print(f"Alert send failed: {type(e).__name__}: {e}"[:300], file=sys.stderr)
         return 1

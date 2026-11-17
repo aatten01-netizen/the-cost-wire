@@ -13,7 +13,7 @@ import csv
 import os
 import sys
 
-from . import accuracy
+from . import accuracy, unsubscribe
 from .paths import BRIEFS_DIR, DATA_DIR, SITE_DIR
 
 
@@ -75,6 +75,9 @@ def run_checks(data_dir=None, briefs_dir=None, site_dir=None, env=None) -> list[
         (env.get("SIGNUP_FORM_URL") or "").startswith("https://")
         and (env.get("SIGNUP_LIVE") or "").strip().lower() == "yes",
         "Andy's go-ahead step: docs/signup-google-sheet.md")
+    add("Unsubscribe link + mailing address set (UNSUBSCRIBE_URL + MAIL_POSTAL_ADDRESS)",
+        unsubscribe.ready(env),
+        "Needed by law before emailing any reader: docs/unsubscribe.md")
     return checks
 
 
