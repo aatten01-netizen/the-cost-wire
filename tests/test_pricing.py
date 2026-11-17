@@ -59,3 +59,31 @@ def test_site_builds_pricing_page_and_nav_links_it(tmp_path):
     assert 'id="signup"' in (out / "index.html").read_text(encoding="utf-8")
     for p in ("index.html", "archive.html", "cash-rent.html", "briefs/2026-11-02.html"):
         assert "pricing.html" in (out / p).read_text(encoding="utf-8"), p
+
+
+def test_mock_page_says_pro_is_not_open_and_nothing_charges():
+    out = pricing.render({})
+    assert "(coming soon)" in out
+    assert "Not yet." in out and "Nothing on this page charges you." in out
+    assert "once its features are built" not in out  # stale: every Pro feature is built
+    assert "Pro will be month to month" in out
+
+
+def test_live_checkout_page_does_not_say_coming_soon_or_not_yet():
+    # QA Nov 17: a live Buy button used to sit next to "(coming soon)" and
+    # "Not yet... Nothing on this page charges you."
+    out = pricing.render({"PRO_CHECKOUT_URL": STRIPE, "PRO_CHECKOUT_LIVE": "yes"})
+    assert "Start Pro" in out
+    assert "coming soon" not in out
+    assert "Not yet." not in out
+    assert "Nothing on this page charges you" not in out
+    assert "Pro is month to month" in out and "Pro will be" not in out
+    # the data-not-advice answer is there either way
+    assert "It is data, not advice." in out
+
+
+def test_faq_order_is_the_same_whether_open_or_not():
+    closed = [q for q, _ in pricing.faq({})]
+    live = [q for q, _ in pricing.faq({"PRO_CHECKOUT_URL": STRIPE, "PRO_CHECKOUT_LIVE": "yes"})]
+    assert closed == live
+    assert closed[0] == "Is Pro open now?" and closed[-1] == "Can I cancel?"

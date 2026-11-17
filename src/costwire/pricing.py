@@ -33,19 +33,37 @@ PRO_FEATURES = [
     "Everything in Free",
 ]
 
-FAQ = [
+# The "Is Pro open now?" and "Can I cancel?" answers depend on whether
+# checkout is live, so the page never says "nothing charges you" next to a
+# working Buy button (or "Pro is open" when it is not).
+FAQ_NOT_OPEN = [
     ("Is Pro open now?",
-     "Not yet. The free brief is live today. Pro opens once its features are built. "
-     "Nothing on this page charges you."),
+     "Not yet. The free brief is live today. Pro opens once enough farmers tell us they'd pay "
+     "for it. Nothing on this page charges you."),
+    ("Can I cancel?",
+     "Yes, Pro will be month to month (or yearly) with no contract."),
+]
+FAQ_OPEN = [
+    ("Is Pro open now?",
+     f"Yes. Pro is ${PRO_MONTHLY}/month or ${PRO_YEARLY}/year, paid through Stripe. "
+     "The free brief stays free."),
+    ("Can I cancel?",
+     "Yes, Pro is month to month (or yearly) with no contract. Cancel any time."),
+]
+FAQ_ALWAYS = [
     ("Where do the numbers come from?",
      "Public USDA AMS, USDA NASS and EIA reports. Each number shows its source link and date. "
      "If a source is missing, the number is left out."),
     ("Will you tell me when to buy fertilizer?",
      "No. The Cost Wire reports published prices and how they changed. "
      "It is data, not advice. Buying decisions are yours."),
-    ("Can I cancel?",
-     "Yes, Pro will be month to month (or yearly) with no contract."),
 ]
+
+
+def faq(env=None) -> list[tuple[str, str]]:
+    """The Questions list for the pricing page, matching whether checkout is live."""
+    first, cancel = FAQ_OPEN if checkout_live(env) else FAQ_NOT_OPEN
+    return [first, *FAQ_ALWAYS, cancel]
 
 
 def checkout_live(env=None) -> bool:
@@ -75,7 +93,9 @@ def render(env=None) -> str:
     """The pricing page body (goes between the nav and </body>)."""
     from . import pro_waitlist  # local import: pro_waitlist imports this module
     env = os.environ if env is None else env
-    faq = "\n".join(f"<h3>{html.escape(q)}</h3>\n<p>{html.escape(a)}</p>" for q, a in FAQ)
+    faq_html = "\n".join(f"<h3>{html.escape(q)}</h3>\n<p>{html.escape(a)}</p>" for q, a in faq(env))
+    soon = "" if checkout_live(env) else ' <span class="soon">(coming soon)</span>'
+
     return f"""<h1>Pricing</h1>
 <p>The weekly brief is free. Pro is for farmers who want their own state's numbers and an alert when prices move.</p>
 <div class="plans">
@@ -86,7 +106,7 @@ def render(env=None) -> str:
 <a class="buy" href="index.html#signup">Get the free brief</a>
 </section>
 <section class="plan">
-<h2>Pro <span class="soon">(coming soon)</span></h2>
+<h2>Pro{soon}</h2>
 <p class="price">${PRO_MONTHLY}/month or ${PRO_YEARLY}/year</p>
 {_ul(PRO_FEATURES)}
 {checkout_button(env)}
@@ -95,7 +115,7 @@ def render(env=None) -> str:
 </section>
 </div>
 <h2>Questions</h2>
-{faq}
+{faq_html}
 <p class="note">Data: USDA and EIA. Data, not advice. The Cost Wire reports published prices; it does not tell anyone what to buy or sell.</p>"""
 
 
