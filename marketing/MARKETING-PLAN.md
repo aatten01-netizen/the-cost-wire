@@ -42,3 +42,4 @@ Free weekly brief (web + email). Later paid tier (~$9-15/month per BRIEF.md): yo
 - [x] 20. Welcome email for new signups, with the "which state?" question (marketing/welcome-email.md)
 - [x] 21. "Your state's edition is here" launch note: email intro, Facebook post, forum reply (marketing/state-edition-email-launch.md)
 - [x] 22. Unsubscribe form + one-question exit survey (marketing/unsubscribe-exit-survey.md)
+- [x] 23. "Tell me when Pro opens" waitlist push: brief P.S., Facebook post, reader reply (marketing/pro-waitlist-push.md)

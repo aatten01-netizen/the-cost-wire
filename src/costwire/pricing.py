@@ -73,6 +73,8 @@ def _ul(items) -> str:
 
 def render(env=None) -> str:
     """The pricing page body (goes between the nav and </body>)."""
+    from . import pro_waitlist  # local import: pro_waitlist imports this module
+    env = os.environ if env is None else env
     faq = "\n".join(f"<h3>{html.escape(q)}</h3>\n<p>{html.escape(a)}</p>" for q, a in FAQ)
     return f"""<h1>Pricing</h1>
 <p>The weekly brief is free. Pro is for farmers who want their own state's numbers and an alert when prices move.</p>
@@ -88,6 +90,7 @@ def render(env=None) -> str:
 <p class="price">${PRO_MONTHLY}/month or ${PRO_YEARLY}/year</p>
 {_ul(PRO_FEATURES)}
 {checkout_button(env)}
+{pro_waitlist.render(env)}
 <p><a href="state/index.html">Preview your state's brief</a> · <a href="pro-sample.html">See a sample Pro alert</a> · <a href="alerts.html">See the alert choices</a> · <a href="worksheet.html">Try the cost-per-acre worksheet</a></p>
 </section>
 </div>

@@ -28,7 +28,7 @@ import shutil
 import sys
 from datetime import date
 
-from . import (alert_signup, changes, corn_price, feed_rss, nass_land, pricing, pro_sample,
+from . import (alert_signup, changes, corn_price, feed_rss, nass_land, pricing, pro_sample, pro_waitlist,
                rentpage, state_brief, state_list, worksheet)
 from .paths import BRIEFS_DIR, SITE_DIR
 
@@ -174,7 +174,7 @@ def pricing_page(env=None) -> str:
     """Pricing page in the same page frame as the archive."""
     page = archive_page([]).replace("<title>The Cost Wire — archive</title>",
                                     "<title>The Cost Wire — pricing</title>")
-    page = page.replace("</style>", pricing.PRICING_CSS + "</style>", 1)
+    page = page.replace("</style>", pricing.PRICING_CSS + pro_waitlist.WAITLIST_CSS + "</style>", 1)
     start = page.index("<h1>Archive</h1>")
     end = page.index("</body>")
     return page[:start] + pricing.render(env) + "\n" + page[end:]

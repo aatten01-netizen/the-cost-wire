@@ -45,3 +45,4 @@ One step per weekly build session. Do the first unchecked step, then check it of
 
 ## Added by build bot (Nov 17)
 - [x] 24. Unsubscribe link + mailing address on every email (CAN-SPAM, needed before any reader send): footer + `List-Unsubscribe` header on the brief, state-edition and alert emails from `UNSUBSCRIBE_URL` (https/mailto only) + `MAIL_POSTAL_ADDRESS` (env, never committed; brackets if missing, never guessed); `UNSUBSCRIBES_FILE` (outside the repo) drops opted-out readers in state_email and alerts; launch check flags it; docs/unsubscribe.md. Tests.
+- [x] 25. Pro waitlist on the pricing page: "Tell me when Pro opens" form (email, optional state, "Would you pay?" yes $9/mo / yes $90/yr / maybe) posting `pro_plan` to the same Google Sheet, shown only when the signup is live and checkout is not; `python -m costwire.pro_waitlist sheet.csv` prints the clear-yes tally vs the goal of 5 (counts only, no emails). Apps Script doc updated. Tests.
