@@ -8,6 +8,7 @@ Pages it writes:
   site/alerts.html             price-move alert sign-up (see alert_signup.py)
   site/pro-sample.html         sample Pro alert from a real saved move (see pro_sample.py)
   site/worksheet.html          cost-per-acre worksheet, Pro preview (see worksheet.py)
+  site/team.html               Team plan for ag businesses, price 'ask', mock checkout (see team.py)
   site/state/<st>.html         state editions of the newest brief, Pro preview (see state_brief.py)
   site/state/index.html        list of the state editions
   site/feed.xml                RSS feed of the briefs (see feed_rss.py)
@@ -29,7 +30,7 @@ import sys
 from datetime import date
 
 from . import (alert_signup, changes, corn_price, feed_rss, nass_land, pricing, pro_sample, pro_waitlist,
-               rentpage, state_brief, state_list, worksheet)
+               rentpage, state_brief, state_list, team, worksheet)
 from .paths import BRIEFS_DIR, SITE_DIR
 
 BRIEF_NAME = re.compile(r"^(\d{4}-\d{2}-\d{2})\.html$")
@@ -180,6 +181,16 @@ def pricing_page(env=None) -> str:
     return page[:start] + pricing.render(env) + "\n" + page[end:]
 
 
+def team_page(env=None) -> str:
+    """Team plan page in the same page frame as the archive."""
+    page = archive_page([]).replace("<title>The Cost Wire — archive</title>",
+                                    "<title>The Cost Wire — Team plan for ag businesses</title>")
+    page = page.replace("</style>", pricing.PRICING_CSS + pro_waitlist.WAITLIST_CSS + "</style>", 1)
+    start = page.index("<h1>Archive</h1>")
+    end = page.index("</body>")
+    return page[:start] + team.render(env) + "\n" + page[end:]
+
+
 def alerts_page(rows, env=None) -> str:
     """Alert sign-up page in the same page frame as the archive."""
     page = archive_page([]).replace("<title>The Cost Wire — archive</title>",
@@ -259,6 +270,7 @@ def build_site(briefs_dir=None, site_dir=None, land_file=None, price_file=None,
     (site_dir / "cash-rent.html").write_text(
         rent_page(nass_land.load_records(land_file)), encoding="utf-8")
     (site_dir / "pricing.html").write_text(pricing_page(), encoding="utf-8")
+    (site_dir / "team.html").write_text(team_page(), encoding="utf-8")
     rows = changes.read_rows(price_file)
     (site_dir / "alerts.html").write_text(alerts_page(rows), encoding="utf-8")
     (site_dir / "pro-sample.html").write_text(pro_sample_page(rows), encoding="utf-8")

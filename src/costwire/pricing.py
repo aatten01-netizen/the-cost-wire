@@ -114,6 +114,7 @@ def render(env=None) -> str:
 <p><a href="state/index.html">Preview your state's brief</a> · <a href="pro-sample.html">See a sample Pro alert</a> · <a href="alerts.html">See the alert choices</a> · <a href="worksheet.html">Try the cost-per-acre worksheet</a></p>
 </section>
 </div>
+<p class="team-link">Lender, agronomist or co-op? <a href="team.html">See the Team plan for ag businesses</a>.</p>
 <h2>Questions</h2>
 {faq_html}
 <p class="note">Data: USDA and EIA. Data, not advice. The Cost Wire reports published prices; it does not tell anyone what to buy or sell.</p>"""

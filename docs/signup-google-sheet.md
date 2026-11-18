@@ -2,8 +2,8 @@
 
 One Sheet holds both the free brief signups and the price-alert choices.
 
-1. Make a new Google Sheet called "Cost Wire signups". Row 1: `time`, `email`, `alert_item`, `alert_region`, `alert_threshold`, `state`, `pro_plan`.
-   (Already made the sheet? Just type `state` in cell F1 and `pro_plan` in cell G1.)
+1. Make a new Google Sheet called "Cost Wire signups". Row 1: `time`, `email`, `alert_item`, `alert_region`, `alert_threshold`, `state`, `pro_plan`, `plan`, `team_role`, `team_size`.
+   (Already made the sheet? Just type `state` in F1, `pro_plan` in G1, `plan` in H1, `team_role` in I1 and `team_size` in J1.)
 2. In the sheet: Extensions > Apps Script. Replace the code with:
 
 ```js
@@ -24,8 +24,13 @@ function doPost(e) {
   var state = /^(IA|IL|MN|WI)$/.test(p.state || "") ? p.state : "";
   // Pro waitlist answer (from pricing.html) is optional: monthly, yearly or maybe, else blank.
   var plan = /^(monthly|yearly|maybe)$/.test(p.pro_plan || "") ? p.pro_plan : "";
-  SpreadsheetApp.getActiveSheet().appendRow([new Date(), email, item, region, amount, state, plan]);
+  // Team waitlist (from team.html) is optional: plan=team + role + client-count range, else blank.
+  var team = p.plan === "team" ? "team" : "";
+  var role = team && /^(lender|agronomist|coop|other)$/.test(p.team_role || "") ? p.team_role : "";
+  var size = team && /^(1-10|11-50|51\+)$/.test(p.team_size || "") ? p.team_size : "";
+  SpreadsheetApp.getActiveSheet().appendRow([new Date(), email, item, region, amount, state, plan, team, role, size]);
   var msg = item ? "Thanks! Your alert is saved and you are on the Monday list."
+          : team ? "Thanks! You are on the Team waitlist. We will reply with a price before anything is charged."
           : plan ? "Thanks! You are on the Pro waitlist and the free Monday list. Nothing was charged."
           : "Thanks! You are on the list.";
   return HtmlService.createHtmlOutput("<p style='font-family:Georgia'>" + msg + " <a href='javascript:history.back()'>Back</a></p>");
@@ -58,3 +63,10 @@ When the signup is live (and Pro checkout is not), the pricing page shows a "Tel
 2. Run: `PYTHONPATH=src python -m costwire.pro_waitlist ~/Downloads/signups.csv`
    It prints counts only (never emails): clear yes (monthly + yearly) vs the goal of 5, maybe, and clear yes per state. Writes no file.
 3. Put the numbers (no names) in LOG.md. At 5 clear yes, make the Stripe Payment Link and set `PRO_CHECKOUT_URL` + `PRO_CHECKOUT_LIVE=yes`; the waitlist form then disappears and the real checkout button shows.
+
+## Team waitlist tally (ag businesses)
+When the signup is live (and Team checkout is not), site/team.html shows a "Tell me when Team opens" form that saves `plan`=team, `team_role` (lender / agronomist / coop / other) and `team_size` (1-10 / 11-50 / 51+) in columns H-J. Nothing is charged.
+1. Download the Sheet as CSV OUTSIDE the repo.
+2. Run: `PYTHONPATH=src python -m costwire.team ~/Downloads/signups.csv`
+   It prints counts only (never emails or names): team signups by role and by size. Writes no file.
+3. Reply to each business yourself with a price. Once you pick one, set `TEAM_MONTHLY` in `src/costwire/team.py`, make a Stripe Payment Link and set `TEAM_CHECKOUT_URL` + `TEAM_CHECKOUT_LIVE=yes`.

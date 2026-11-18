@@ -60,6 +60,8 @@ jobs:
           ALERTS_SIGNUP_LIVE: ${{ vars.ALERTS_SIGNUP_LIVE }}
           PRO_CHECKOUT_URL: ${{ vars.PRO_CHECKOUT_URL }}
           PRO_CHECKOUT_LIVE: ${{ vars.PRO_CHECKOUT_LIVE }}
+          TEAM_CHECKOUT_URL: ${{ vars.TEAM_CHECKOUT_URL }}
+          TEAM_CHECKOUT_LIVE: ${{ vars.TEAM_CHECKOUT_LIVE }}
         run: python -m costwire.weekly
       - name: Commit the new data, brief and site
         if: steps.when.outputs.run == 'true'
