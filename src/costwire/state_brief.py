@@ -54,7 +54,8 @@ def build_edition(results: list[dict], state: str, brief_date: date,
     problems = (accuracy.check_brief(md, rows)
                 + accuracy.check_afford(md, rows, corn_prices or [])
                 + accuracy.check_trend(md, rows, history or [])
-                + accuracy.check_nitrogen(md, rows))
+                + accuracy.check_nitrogen(md, rows)
+                + accuracy.check_since_march(md, rows, history or []))
     if problems:
         raise ValueError(f"{brief.region_name(state)} edition failed the accuracy check: "
                          + " | ".join(problems))

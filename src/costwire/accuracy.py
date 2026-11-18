@@ -209,6 +209,17 @@ def check_nitrogen(markdown: str, results: list[dict]) -> list[str]:
     return problems
 
 
+def check_since_march(markdown: str, results: list[dict], rows: list[dict]) -> list[str]:
+    """The "since early March" lines must match the saved prices exactly, nothing extra or missing."""
+    found = section_lines(markdown, brief.SINCE_MARCH_TITLE)
+    wanted = [s["md"] for s in brief.build(results, date.today(), None, rows)["since_march"]]
+    problems = [f"Brief: since-March line not in the saved data: '{line}'"
+                for line in found if line not in wanted]
+    problems += [f"Brief: since-March line in the data but missing from the brief: '{line}'"
+                 for line in wanted if line not in found]
+    return problems
+
+
 def newest_brief(out_dir=None):
     files = sorted(Path(out_dir or BRIEFS_DIR).glob("*.md"))
     return files[-1] if files else None
@@ -224,7 +235,8 @@ def run_checks(brief_path=None, data_path=None, today=None, corn_path=None) -> l
     results = changes.compute(rows)
     text = path.read_text(encoding="utf-8")
     return (problems + check_brief(text, results) + check_afford(text, results, corn_prices)
-            + check_trend(text, results, rows) + check_nitrogen(text, results))
+            + check_trend(text, results, rows) + check_nitrogen(text, results)
+            + check_since_march(text, results, rows))
 
 
 def main(argv=None) -> int:

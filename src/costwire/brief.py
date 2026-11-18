@@ -5,7 +5,8 @@ No AI, just a template. The brief has:
     (or vs 1 year ago if there are no 2-week changes yet)
   - a table: every price, its change vs 2 weeks and 1 year ago, date, source
   - one "what changed" line per item
-  - bushels of corn per ton, cost per pound of N, and 12-week trends (when the data allows)
+  - bushels of corn per ton, cost per pound of N, "since early March" and
+    12-week trends (when the data allows)
   - the sources (with links and dates)
   - a disclaimer (data, not advice)
 
@@ -25,7 +26,7 @@ import sys
 from datetime import date, datetime
 from zoneinfo import ZoneInfo
 
-from . import affordability, changes, corn_price, nitrogen, trend
+from . import affordability, changes, corn_price, nitrogen, since_march, trend
 from .paths import BRIEFS_DIR
 
 ITEM_NAMES = {
@@ -274,6 +275,33 @@ def nitrogen_line(n: dict) -> str:
             f"÷ {n['lb_n']:,} lb of N per ton, {nitrogen.GRADE[n['item']]}).")
 
 
+SINCE_MARCH_TITLE = "Since early March"
+SINCE_MARCH_NOTE = ("Each fertilizer's newest USDA AMS price vs the last saved report from the "
+                    "same AMS report dated before March 4, 2026. Shown only when that older "
+                    "report is saved; never estimated. Numbers only, not advice.")
+
+
+def since_march_line(s: dict) -> str:
+    """One plain sentence per fertilizer + state: now vs before March 4, in $ and %."""
+    u = per_unit(s["unit"])
+    return (f"{region_name(s['region'])} {item_in_sentence(s['item'])}: "
+            f"{money(s['price'])}{u} ({short_date(s['as_of'])}) vs "
+            f"{money(s['base_price'])}{u} ({short_date(s['base_as_of'])}), "
+            f"{signed_change(s['change'], s['pct'])}.")
+
+
+def since_march_links(s: dict) -> list[tuple]:
+    """(label, url) for both prices: the newest report and the pre-March one."""
+    return [(f"USDA AMS, {short_date(s['as_of'])}", s["source_url"]),
+            (f"USDA AMS, {short_date(s['base_as_of'])}", s["base_source_url"])]
+
+
+def since_march_md(s: dict) -> str:
+    """The Markdown bullet text: the sentence plus both source links."""
+    links = ", ".join(f"[{label}]({url})" for label, url in since_march_links(s))
+    return f"{since_march_line(s)} Sources: {links}."
+
+
 TREND_TITLE = "12-week price trend"
 TREND_NOTE = ("Every saved price for each fertilizer over the last 12 weeks, from the same "
               "USDA AMS report as the table above. Shown only when at least 2 dates are saved.")
@@ -317,6 +345,9 @@ def build(results: list[dict], brief_date: date, corn_prices=None, history=None,
         "afford": [afford_line(a) for a in afford],
         "afford_sources": afford_sources(afford),
         "nitrogen": [nitrogen_line(n) for n in nitrogen.compute(results)],
+        "since_march": [{"line": since_march_line(s), "md": since_march_md(s),
+                         "links": since_march_links(s)}
+                        for s in since_march.compute(results, history or [])],
         "trends": [{"line": trend_line(t),
                     "svg": trend.svg(t["points"], f"{TREND_TITLE}: {trend_line(t)}")}
                    for t in trends],
@@ -348,6 +379,9 @@ def to_markdown(b: dict) -> str:
     if b.get("nitrogen"):
         out += ["", f"## {NITROGEN_TITLE}", "", NITROGEN_NOTE, ""]
         out += [f"- {line}" for line in b["nitrogen"]]
+    if b.get("since_march"):
+        out += ["", f"## {SINCE_MARCH_TITLE}", "", SINCE_MARCH_NOTE, ""]
+        out += [f"- {s['md']}" for s in b["since_march"]]
     if b.get("trends"):
         out += ["", f"## {TREND_TITLE}", "", TREND_NOTE, ""]
         out += [f"- {t['line']}" for t in b["trends"]]
@@ -387,6 +421,14 @@ def to_html(b: dict) -> str:
     if b.get("nitrogen"):
         items = "\n".join(f"<li>{e(line)}</li>" for line in b["nitrogen"])
         nitro = (f"<h2>{e(NITROGEN_TITLE)}</h2>\n<p class=\"note\">{e(NITROGEN_NOTE)}</p>\n"
+                 f"<ul>\n{items}\n</ul>\n")
+    march = ""
+    if b.get("since_march"):
+        items = "\n".join(
+            f"<li>{e(s['line'])} Sources: "
+            + ", ".join(f"<a href=\"{e(url)}\">{e(label)}</a>" for label, url in s["links"])
+            + ".</li>" for s in b["since_march"])
+        march = (f"<h2>{e(SINCE_MARCH_TITLE)}</h2>\n<p class=\"note\">{e(SINCE_MARCH_NOTE)}</p>\n"
                  f"<ul>\n{items}\n</ul>\n")
     trends = ""
     if b.get("trends"):
@@ -434,7 +476,7 @@ ul.trends li {{ margin-bottom: 0.8rem; }}
 <ul>
 {lines}
 </ul>
-{afford}{nitro}{trends}<h2>Sources</h2>
+{afford}{nitro}{march}{trends}<h2>Sources</h2>
 <ul>
 {srcs}
 </ul>
