@@ -38,4 +38,10 @@ urea,770.0,$/ton,2026-11-13,USDA AMS Illinois Production Cost Report,https://www
 ddgs,165.19,$/ton,2026-11-16,USDA AMS National Weekly Grain Co-Products Report,https://www.ams.usda.gov/mnreports/ams_3618.pdf,IA
 ddgs,201.0,$/ton,2026-11-16,USDA AMS National Weekly Grain Co-Products Report,https://www.ams.usda.gov/mnreports/ams_3618.pdf,IL
 ddgs,166.25,$/ton,2026-11-16,USDA AMS National Weekly Grain Co-Products Report,https://www.ams.usda.gov/mnreports/ams_3618.pdf,MN
+onhwy_diesel,5.967,$/gal,2026-11-16,U.S. Energy Information Administration (EIA),https://www.eia.gov/dnav/pet/hist/LeafHandler.ashx?n=PET&s=EMD_EPD2D_PTE_R20_DPG&f=W,PADD2
+res_propane,2.297,$/gal,2026-11-16,U.S. Energy Information Administration (EIA),https://www.eia.gov/dnav/pet/hist/LeafHandler.ashx?n=PET&s=W_EPLLPA_PRS_R20_DPG&f=W,PADD2
 ddgs,169.5,$/ton,2026-11-16,USDA AMS National Weekly Grain Co-Products Report,https://www.ams.usda.gov/mnreports/ams_3618.pdf,WI
+ddgs,160.5,$/ton,2026-11-23,USDA AMS National Weekly Grain Co-Products Report,https://www.ams.usda.gov/mnreports/ams_3618.pdf,IA
+ddgs,205.0,$/ton,2026-11-23,USDA AMS National Weekly Grain Co-Products Report,https://www.ams.usda.gov/mnreports/ams_3618.pdf,IL
+ddgs,168.75,$/ton,2026-11-23,USDA AMS National Weekly Grain Co-Products Report,https://www.ams.usda.gov/mnreports/ams_3618.pdf,MN
+ddgs,168.5,$/ton,2026-11-23,USDA AMS National Weekly Grain Co-Products Report,https://www.ams.usda.gov/mnreports/ams_3618.pdf,WI
