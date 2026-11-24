@@ -45,3 +45,4 @@ Free weekly brief (web + email). Later paid tier (~$9-15/month per BRIEF.md): yo
 - [x] 23. "Tell me when Pro opens" waitlist push: brief P.S., Facebook post, reader reply (marketing/pro-waitlist-push.md)
 - [x] 24. Team plan outreach: 4 messages to ag lenders, agronomists, co-ops, farm consultants + follow-up (marketing/team-plan-outreach.md)
 - [x] 25. "Since early March" share posts: brief P.S., Facebook, forum reply, "good time to buy?" reply (marketing/since-march-share-posts.md)
+- [x] 26. "Since early March" story pitch to 3 farm news desks + follow-up (marketing/since-march-media-pitch.md)

@@ -1,0 +1,63 @@
+# PLAN step 26: load one archived pre-March 2026 USDA AMS report each for Iowa
+# (ams_2863) and Illinois (ams_3195) from the MyMarketNews file repository, so the
+# brief's "Since early March" section shows real numbers. Free, no keys.
+# Runs by hand only (Actions tab > Fetch archived reports > Run workflow).
+# Optional input: a direct archive PDF link for one state, if the automatic
+# search can't find it.
+name: Fetch archived reports
+
+on:
+  workflow_dispatch:
+    inputs:
+      state:
+        description: "IA, IL, or blank for both"
+        required: false
+        default: ""
+      url:
+        description: "Optional: exact archive PDF link (needs one state above)"
+        required: false
+        default: ""
+
+permissions:
+  contents: write
+
+jobs:
+  fetch:
+    runs-on: ubuntu-latest
+    env:
+      PYTHONPATH: src
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install
+        run: pip install -r requirements.txt
+      - name: Load archived pre-March reports
+        env:
+          IN_STATE: ${{ inputs.state }}
+          IN_URL: ${{ inputs.url }}
+        run: |
+          args="$IN_STATE"
+          if [ -n "$IN_URL" ]; then args="$args --url $IN_URL"; fi
+          python -m costwire.archive_report $args
+      - name: Rebuild the site and check accuracy
+        env:
+          SIGNUP_FORM_URL: ${{ vars.SIGNUP_FORM_URL }}
+          SIGNUP_LIVE: ${{ vars.SIGNUP_LIVE }}
+          ALERTS_SIGNUP_LIVE: ${{ vars.ALERTS_SIGNUP_LIVE }}
+          PRO_CHECKOUT_URL: ${{ vars.PRO_CHECKOUT_URL }}
+          PRO_CHECKOUT_LIVE: ${{ vars.PRO_CHECKOUT_LIVE }}
+          TEAM_CHECKOUT_URL: ${{ vars.TEAM_CHECKOUT_URL }}
+          TEAM_CHECKOUT_LIVE: ${{ vars.TEAM_CHECKOUT_LIVE }}
+        run: |
+          python -m costwire.site
+          python -m costwire.accuracy
+          python -m pytest -q
+      - name: Commit if new
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898333+github-actions[bot]@users.noreply.github.com"
+          git add data site briefs
+          git diff --cached --quiet || git commit -m "Load archived pre-March 2026 Iowa/Illinois AMS reports (Since early March section)"
+          git push
